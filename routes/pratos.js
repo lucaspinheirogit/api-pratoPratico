@@ -12,12 +12,24 @@ const pratosDAO = require('../dao/pratosDAO');
 */
 router.get("/", (req, res, next) => {
 
+    //Definir valores de paginacao default caso nenhum valor for passado na query da request
     let offset = Object.is(req.query.offset, undefined) ? 0 : req.query.offset;
     let limit = Object.is(req.query.limit, undefined) ? 9999 : req.query.limit;
 
     new pratosDAO(req.connection)
         .list(offset, limit)
-        .then(pizza => res.send(pizza))
+        .then(pratos => {
+            let hasMore = pratos.total > (parseInt(offset) + parseInt(limit));  
+            res.send({
+                "pagination": {
+                    offset,
+                    limit,
+                    "total": pratos.total,
+                    "hasMore" : hasMore,
+                },
+                "pratos": pratos.pratos
+            })
+        })
         .catch(next)
 });
 
@@ -40,7 +52,7 @@ router.post("/", (req, res, next) => {
 router.get("/detalhe/:id", (req, res, next) =>
     new pratosDAO(req.connection)
         .get(req.params.id)
-        .then(pizza => res.send(pizza))
+        .then(prato => res.send(prato))
         .catch(next)
 );
 
@@ -50,7 +62,7 @@ router.get("/detalhe/:id", (req, res, next) =>
 router.get("/usuario/:id", (req, res, next) =>
     new pratosDAO(req.connection)
         .listFromUser(req.params.id)
-        .then(pizza => res.send(pizza))
+        .then(prato => res.send(prato))
         .catch(next)
 );
 
@@ -60,7 +72,7 @@ router.get("/usuario/:id", (req, res, next) =>
 router.get("/random", (req, res, next) =>
     new pratosDAO(req.connection)
         .random()
-        .then(pizza => res.send(pizza))
+        .then(prato => res.send(prato))
         .catch(next)
 );
 

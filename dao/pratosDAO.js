@@ -13,7 +13,7 @@ class pratosDAO {
             let sql = `INSERT INTO pratos
             (Nome, Descricao, ModoPreparo, TempoPreparo, Dificuldade, Dono, Foto, Public, DataCriacao)
             VALUES ('${nome}','${desc}','${modo}','${tempo}','${dif}','${dono}','${foto}','${publica}','${data}')`;
-            
+
             this._connection.query(sql, (err, result, fields) => {
                 if (err) return reject(err);
                 resolve(result);
@@ -23,10 +23,22 @@ class pratosDAO {
 
     list(offset, limit) {
         return new Promise((resolve, reject) => {
-            let sql = `SELECT * FROM pratos WHERE public = '1' ORDER BY id desc LIMIT ${offset}, ${limit} `;
+            let resultado = {
+                "pratos": '',
+                "total": 0
+            }
+
+            let sql = `SELECT * FROM pratos WHERE public = '1' ORDER BY id desc LIMIT ${offset}, ${limit}`;
             this._connection.query(sql, (err, result, fields) => {
                 if (err) return reject(err);
-                resolve(result);
+                resultado.pratos = result;
+
+                let sql2 = `SELECT COUNT(*) FROM pratos where public = '1'`;
+                this._connection.query(sql2, (err, result, fields) => {
+                    if (err) return reject(err);
+                    resultado.total = result[0]['COUNT(*)'];
+                    resolve(resultado);
+                })
             })
         });
     }
