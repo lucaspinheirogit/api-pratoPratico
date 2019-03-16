@@ -20,11 +20,8 @@ router.post('/', (req, res, next) => {
     new loginDAO(req.connection)
         .login(req.body.email, req.body.senha)
         .then(result => {
-            console.log(result);
-            
             result.auth ? res.status(200).json(result.token) : res.status(401).send(result.mensagem)
-        }
-        )
+        })
         .catch(next)
 }
 );

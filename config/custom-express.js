@@ -28,6 +28,9 @@ app.use('/signin', signin);
 const pratos = require('../routes/pratos.js');
 app.use('/pratos', pratos);
 
+const ingredientes = require('../routes/ingredientes.js');
+app.use('/ingredientes', ingredientes);
+
 app.get('/', (req, res) => {
     res.json({
         message: "Ola mundo! 😎👌"
