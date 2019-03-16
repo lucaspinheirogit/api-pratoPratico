@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const dificuldadeEnum = require('../enums/dificuldade');
 
 const pratosDAO = require('../dao/pratosDAO');
 
@@ -38,6 +39,7 @@ router.get("/", (req, res, next) => {
 */
 router.post("/", (req, res, next) => {
     let { nome, descricao, modo, tempo, dificuldade, dono, foto, publica } = req.body;
+    dificuldade = dificuldadeEnum.MEDIO;
 
     new pratosDAO(req.connection)
         .create(nome, descricao, modo, tempo, dificuldade, dono, foto, publica)

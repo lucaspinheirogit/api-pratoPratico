@@ -10,7 +10,7 @@ class loginDAO {
     login(email, senha) {
         return new Promise((resolve, reject) => {
 
-            var sql = `SELECT * FROM usuarios WHERE email='${email}' and senha='${senha}' `;
+            var sql = `SELECT * FROM usuario WHERE email='${email}' and senha='${senha}' `;
 
             this._connection.query(sql, (err, result, fields) => {
                 if (err) return reject(err);
@@ -44,7 +44,7 @@ class loginDAO {
     signin(nome, email, senha) {
         return new Promise((resolve, reject) => {
 
-            let sql = `SELECT * FROM usuarios WHERE email='${email}'`;
+            let sql = `SELECT * FROM usuario WHERE email='${email}'`;
 
             this._connection.query(sql, function (err, result, fields) {
                 if (err) return reject(err);
@@ -53,7 +53,7 @@ class loginDAO {
                     resolve({ auth: false, mensagem: 'Já existe um usuário cadastrado com esse email!' });
                 } else {
 
-                    let sql = `INSERT INTO usuarios (nome, email, senha) VALUES ('${nome}', '${email}', '${senha}')`;
+                    let sql = `INSERT INTO usuario (nome, email, senha) VALUES ('${nome}', '${email}', '${senha}')`;
                     this._connection.query(sql, function (err, result) {
                         if (err) return reject(err);
                         resolve({ auth: true, email, senha });
