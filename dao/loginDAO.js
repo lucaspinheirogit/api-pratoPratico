@@ -17,16 +17,11 @@ class loginDAO {
 
                 if (result.length > 0) {
 
-                    let nome = result[0].nome;
-                    let id = result[0].id;
-
                     const payload = {
-                        id: id,
-                        username: nome
+                        id: result[0].Id,
+                        username: result[0].Nome
                     }
 
-                    console.log("SECRET: " + process.env.SECRET);
-                    
                     var token = jwt.sign(payload, process.env.SECRET, {
                         expiresIn: 3600 // expira em 15 minutos
                     });

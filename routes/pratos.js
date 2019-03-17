@@ -12,7 +12,6 @@ const pratoDAO = require('../dao/pratoDAO');
 *  listagem de todos os pratos com paginacao opcional (Offset e limit)
 */
 router.get("/", (req, res, next) => {
-
     //Definir valores de paginacao default caso nenhum valor for passado na query da request
     let offset = Object.is(req.query.offset, undefined) ? 0 : req.query.offset;
     let limit = Object.is(req.query.limit, undefined) ? 9999 : req.query.limit;
@@ -38,8 +37,9 @@ router.get("/", (req, res, next) => {
 *  Criação de um novo prato
 */
 router.post("/", (req, res, next) => {
-    let { nome, descricao, modo, tempo, dificuldade, dono, foto, publica } = req.body;
+    let { nome, descricao, modo, tempo, dificuldade, foto, publica } = req.body;
     dificuldade = dificuldadeEnum.MEDIO;
+    let dono = req.user.id;
 
     new pratoDAO(req.connection)
         .create(nome, descricao, modo, tempo, dificuldade, dono, foto, publica)

@@ -23,7 +23,7 @@ app.use('/login', login);
 const signin = require('../routes/signin.js');
 app.use('/signin', signin);
 
-//app.use(auth.checkToken);
+app.use(auth.checkToken);
 
 const pratos = require('../routes/pratos.js');
 app.use('/pratos', pratos);
