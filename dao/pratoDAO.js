@@ -13,7 +13,7 @@ class pratosDAO {
 
             this._connection.query(sql, (err, result, fields) => {
                 if (err) return reject(err);
-                resolve(result);
+                resolve(result.insertId);
             })
         });
     }

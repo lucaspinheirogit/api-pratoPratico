@@ -3,6 +3,7 @@ const router = express.Router();
 const dificuldadeEnum = require('../enums/dificuldade');
 
 const pratoDAO = require('../dao/pratoDAO');
+const ingredienteDAO = require('../dao/ingredienteDAO');
 
 /*  
 !   /pratos
@@ -19,13 +20,13 @@ router.get("/", (req, res, next) => {
     new pratoDAO(req.connection)
         .list(offset, limit)
         .then(pratos => {
-            let hasMore = pratos.total > (parseInt(offset) + parseInt(limit));  
+            let hasMore = pratos.total > (parseInt(offset) + parseInt(limit));
             res.send({
                 "pagination": {
                     offset,
                     limit,
                     "total": pratos.total,
-                    "hasMore" : hasMore,
+                    "hasMore": hasMore,
                 },
                 "pratos": pratos.pratos
             })
@@ -37,14 +38,35 @@ router.get("/", (req, res, next) => {
 *  Criação de um novo prato
 */
 router.post("/", (req, res, next) => {
-    let { nome, descricao, modo, tempo, dificuldade, foto, publica } = req.body;
+    let { nome, descricao, modo, tempo, dificuldade, foto, publica, ingredientes } = req.body;
     dificuldade = dificuldadeEnum.MEDIO;
     let dono = req.user.id;
 
+    let ingredientesId = [];
+    let pratoId = null;
+
     new pratoDAO(req.connection)
         .create(nome, descricao, modo, tempo, dificuldade, dono, foto, publica)
-        .then(result => res.send(result))
+        .then(result => pratoId = result)
         .catch(next)
+
+    ingredientes.forEach(ingrediente => {
+        new ingredienteDAO(req.connection)
+            .create(ingrediente.nome)
+            .then(result => {
+
+                ingredientesId.push(result)
+                // new prato_ingredienteDAO(req.connection).create(result, pratoId)
+
+            })
+            .catch(next)
+    });
+
+    console.log("pratoId: " + pratoId);
+    console.log("ingredientesId: ");
+    console.log(ingredientesId);
+
+    res.send({ "message": "Prato cadastrado com sucesso" });
 });
 
 

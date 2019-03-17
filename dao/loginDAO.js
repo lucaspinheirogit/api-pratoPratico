@@ -23,7 +23,7 @@ class loginDAO {
                     }
 
                     var token = jwt.sign(payload, process.env.SECRET, {
-                        expiresIn: 3600 // expira em 15 minutos
+                        expiresIn: 3600 // expira em 1 hora
                     });
 
                     resolve({ auth: true, mensagem: 'Login Válido!', token: token });

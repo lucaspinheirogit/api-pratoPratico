@@ -5,8 +5,9 @@ const morgan = require('morgan');
 const auth = require('../auth/autorizacao');
 
 const app = express();
-app.use(cors(), express.json(), morgan());
+app.use(cors(), express.json(), morgan('combined'));
 
+// middleware da conexao com o banco de dados mysql
 pool = require('./pool-factory')
 connectionMiddleware = require('./connection-middleware');
 app.use(connectionMiddleware(pool));

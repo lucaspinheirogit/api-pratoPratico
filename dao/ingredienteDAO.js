@@ -16,7 +16,7 @@ class ingredienteDAO {
                         let sql = `INSERT INTO ingrediente (Nome) VALUES ('${nome}')`;
                         this._connection.query(sql, (err, result, fields) => {
                             if (err) return reject(err);
-                            resolve(result);
+                            resolve(result.insertId);
                         })
                     }
                 })
