@@ -19,6 +19,16 @@ router.get("/", (req, res, next) => {
 });
 
 /*  
+*  Listar um ingrediente específico
+*/
+router.get("/:id", (req, res, next) =>
+    new ingredienteDAO(req.connection)
+        .get(req.params.id)
+        .then(prato => res.send(prato))
+        .catch(next)
+);
+
+/*  
 *  Criação de um novo ingrediente
 */
 router.post("/", (req, res, next) => {
@@ -31,14 +41,5 @@ router.post("/", (req, res, next) => {
 });
 
 
-/*  
-*  Listar um ingrediente específico
-*/
-router.get("/:id", (req, res, next) =>
-    new ingredienteDAO(req.connection)
-        .get(req.params.id)
-        .then(prato => res.send(prato))
-        .catch(next)
-);
 
 module.exports = router;

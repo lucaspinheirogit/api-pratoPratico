@@ -40,10 +40,8 @@ router.get("/", (req, res, next) => {
 router.post("/", (req, res, next) => {
     let { nome, descricao, modo, tempo, dificuldade, foto, publica, ingredientes } = req.body;
     dificuldade = dificuldadeEnum.MEDIO;
-    let dono = req.user.id;
-
-    let ingredientesId = [];
-    let pratoId = null;
+    //let dono = req.user.id;
+    let dono = 1;
 
     new pratoDAO(req.connection)
         .create(nome, descricao, modo, tempo, dificuldade, dono, foto, publica)
@@ -54,41 +52,35 @@ router.post("/", (req, res, next) => {
         new ingredienteDAO(req.connection)
             .create(ingrediente.nome)
             .then(result => {
-
-                ingredientesId.push(result)
-                // new prato_ingredienteDAO(req.connection).create(result, pratoId)
-
             })
             .catch(next)
     });
 
-    console.log("pratoId: " + pratoId);
-    console.log("ingredientesId: ");
-    console.log(ingredientesId);
-
-    res.send({ "message": "Prato cadastrado com sucesso" });
+    res.json({ "message": "Prato cadastrado com sucesso" });
 });
 
 
 /*  
 *  Listar um prato específico
 */
-router.get("/detalhe/:id", (req, res, next) =>
+router.get("/detalhe/:id", (req, res, next) => {
+    let {id} = req.params;
     new pratoDAO(req.connection)
-        .get(req.params.id)
+        .get(id)
         .then(prato => res.send(prato))
         .catch(next)
-);
+});
 
 /*  
 *  Listar os pratos de um usuário específico
 */
-router.get("/usuario/:id", (req, res, next) =>
+router.get("/usuario/:id", (req, res, next) => {
+    let {id} = req.params;
     new pratoDAO(req.connection)
-        .listFromUser(req.params.id)
+        .listFromUser(id)
         .then(prato => res.send(prato))
         .catch(next)
-);
+});
 
 /*  
 *  Listar um prato aleatoriamente escolhido
@@ -96,7 +88,7 @@ router.get("/usuario/:id", (req, res, next) =>
 router.get("/random", (req, res, next) =>
     new pratoDAO(req.connection)
         .random()
-        .then(prato => res.send(prato))
+        .then(prato => res.json(prato))
         .catch(next)
 );
 

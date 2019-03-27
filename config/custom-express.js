@@ -5,7 +5,7 @@ const morgan = require('morgan');
 const auth = require('../auth/autorizacao');
 
 const app = express();
-app.use(cors(), express.json(), morgan('combined'));
+app.use(cors(), express.json(), morgan('dev'));
 
 // middleware da conexao com o banco de dados mysql
 pool = require('./pool-factory')
@@ -18,28 +18,19 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: err.toString() });
 });
 
-const login = require('../routes/login.js');
-app.use('/login', login);
-
-const signin = require('../routes/signin.js');
-app.use('/signin', signin);
-
-//app.use(auth.checkToken);
-
-const pratos = require('../routes/pratos.js');
-app.use('/pratos', pratos);
-
-const favoritos = require('../routes/favoritos.js');
-app.use('/favoritos', favoritos);
-
-const ingredientes = require('../routes/ingredientes.js');
-app.use('/ingredientes', ingredientes);
-
 app.get('/', (req, res) => {
     res.json({
-        message: "Ola mundo! 😎👌"
+        message: "Olá mundo! 😎👌"
     })
 });
 
+app.use('/login', require('../routes/login.js'));
+app.use('/signin', require('../routes/signin.js'));
+
+//app.use(auth.checkToken);
+
+app.use('/pratos', require('../routes/pratos.js'));
+app.use('/favoritos', require('../routes/favoritos.js'));
+app.use('/ingredientes', require('../routes/ingredientes.js'));
 
 module.exports = app;

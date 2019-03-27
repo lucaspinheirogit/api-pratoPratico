@@ -2,9 +2,7 @@ const jwt = require('jsonwebtoken');
 
 module.exports = {
     checkToken: function (req, res, next) {  
-
         var token = req.get('authorization');
-
         if (token !== undefined) {
             if (token.length > 0) {
                 jwt.verify(token, process.env.SECRET, (error, user) => {

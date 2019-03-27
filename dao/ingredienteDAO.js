@@ -11,7 +11,7 @@ class ingredienteDAO {
             this.jaExiste(nome)
                 .then(resultado => {
                     if (resultado) {
-                        resolve({ "Message": "ingrediente já existia" })
+                        resolve()
                     } else {
                         let sql = `INSERT INTO ingrediente (Nome) VALUES ('${nome}')`;
                         this._connection.query(sql, (err, result, fields) => {
@@ -48,7 +48,6 @@ class ingredienteDAO {
             let sql = `SELECT * FROM ingrediente WHERE nome='${nome}'`;
             this._connection.query(sql, (err, result, fields) => {
                 if (err) return reject(err);
-                console.log(result.length > 0);
                 resolve(result.length > 0);
             })
         })
