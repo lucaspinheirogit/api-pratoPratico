@@ -1,7 +1,7 @@
 {
-  "name": "server",
+  "name": "api-pratopratico",
   "version": "1.0.0",
-  "description": "",
+  "description": "Api do projeto escolar Prato Prático, criado inteiramente por Lucas Pinheiro",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
