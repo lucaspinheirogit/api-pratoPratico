@@ -24,10 +24,13 @@ app.use('/login', login);
 const signin = require('../routes/signin.js');
 app.use('/signin', signin);
 
-app.use(auth.checkToken);
+//app.use(auth.checkToken);
 
 const pratos = require('../routes/pratos.js');
 app.use('/pratos', pratos);
+
+const favoritos = require('../routes/favoritos.js');
+app.use('/favoritos', favoritos);
 
 const ingredientes = require('../routes/ingredientes.js');
 app.use('/ingredientes', ingredientes);
