@@ -14,7 +14,7 @@ router.get("/", (req, res, next) => {
 
     new ingredienteDAO(req.connection)
         .list()
-        .then(result => res.send(result))
+        .then(result => res.json(result))
         .catch(next)
 });
 
@@ -24,7 +24,7 @@ router.get("/", (req, res, next) => {
 router.get("/:id", (req, res, next) =>
     new ingredienteDAO(req.connection)
         .get(req.params.id)
-        .then(prato => res.send(prato))
+        .then(prato => res.json(prato))
         .catch(next)
 );
 
@@ -36,7 +36,7 @@ router.post("/", (req, res, next) => {
 
     new ingredienteDAO(req.connection)
         .create(nome)
-        .then(result => res.send(result))
+        .then(result => res.json(result))
         .catch(next)
 });
 

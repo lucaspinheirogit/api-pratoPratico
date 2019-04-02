@@ -29,14 +29,14 @@ class loginDAO {
                     resolve({ auth: true, mensagem: 'Login Válido!', token: token });
 
                 } else {
-                    resolve({ auth: false, mensagem: 'Login Inválido!' });
+                    resolve({ auth: false, mensagem: 'Email e/ou Senha incorretos!' });
                 }
 
             })
         });
     }
 
-    signin(nome, email, senha) {
+    signup(nome, email, senha) {
         return new Promise((resolve, reject) => {
 
             let sql = `SELECT * FROM usuario WHERE email='${email}'`;
@@ -45,7 +45,7 @@ class loginDAO {
                 if (err) return reject(err);
 
                 if (result.length > 0) {
-                    resolve({ auth: false, mensagem: 'Já existe um usuário cadastrado com esse email!' });
+                    resolve({ auth: false, mensagem: 'Esse email já foi cadastrado!' });
                 } else {
 
                     let sql = `INSERT INTO usuario (nome, email, senha) VALUES ('${nome}', '${email}', '${senha}')`;

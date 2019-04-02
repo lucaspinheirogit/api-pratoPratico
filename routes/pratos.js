@@ -21,7 +21,7 @@ router.get("/", (req, res, next) => {
         .list(offset, limit)
         .then(pratos => {
             let hasMore = pratos.total > (parseInt(offset) + parseInt(limit));
-            res.send({
+            res.json({
                 "pagination": {
                     offset,
                     limit,
@@ -67,7 +67,7 @@ router.get("/detalhe/:id", (req, res, next) => {
     let {id} = req.params;
     new pratoDAO(req.connection)
         .get(id)
-        .then(prato => res.send(prato))
+        .then(prato => res.json(prato))
         .catch(next)
 });
 
@@ -78,7 +78,7 @@ router.get("/usuario/:id", (req, res, next) => {
     let {id} = req.params;
     new pratoDAO(req.connection)
         .listFromUser(id)
-        .then(prato => res.send(prato))
+        .then(prato => res.json(prato))
         .catch(next)
 });
 

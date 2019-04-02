@@ -18,6 +18,13 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: err.toString() });
 });
 
+// middleware de log da requisicao
+app.use((req, res, next) => {
+    console.log("Body da requisicao: ");
+    console.error(req.body);
+    next();
+});
+
 app.get('/', (req, res) => {
     res.json({
         message: "Olá mundo! 😎👌"
@@ -25,7 +32,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/login', require('../routes/login.js'));
-app.use('/signin', require('../routes/signin.js'));
+app.use('/signup', require('../routes/signup.js'));
 
 //app.use(auth.checkToken);
 
