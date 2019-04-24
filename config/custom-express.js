@@ -34,10 +34,11 @@ app.get('/', (req, res) => {
 app.use('/login', require('../routes/login.js'));
 app.use('/signup', require('../routes/signup.js'));
 
-//app.use(auth.checkToken);
+//<app.use(auth.checkToken);
 
 app.use('/pratos', require('../routes/pratos.js'));
 app.use('/favoritos', require('../routes/favoritos.js'));
 app.use('/ingredientes', require('../routes/ingredientes.js'));
+app.use('/usuarios', require('../routes/usuarios.js'));
 
 module.exports = app;
