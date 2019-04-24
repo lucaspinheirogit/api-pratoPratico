@@ -1,5 +1,4 @@
 const app = require('./config/custom-express');
+require('dotenv').config();
 
-app.listen(5000, () => {
-    console.log("Escutando na porta 5000");
-})
+app.listen(process.env.PORT || 5000);
