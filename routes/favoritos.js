@@ -35,13 +35,13 @@ router.get("/:id", (req, res, next) => {
 *  Favoritar/desfavoritar um prato
 */
 router.post("/", (req, res, next) => {
-    let { prato_id, usuario_id } = req.body;
+    let { prato_id } = req.body;
 
     console.log("favoritando prato");
     
     
     new pratoDAO(req.connection)
-    .favorite(prato_id, usuario_id)
+    .favorite(prato_id, req.user.id)
     .then(result => res.json(result))
     .catch(next)
 });

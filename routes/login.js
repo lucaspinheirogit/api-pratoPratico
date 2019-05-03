@@ -12,17 +12,23 @@ const loginDAO = require('../dao/loginDAO');
 */
 
 router.post('/', (req, res, next) => {
-    let { email, senha } = req.body;
-    
+    let {
+        email,
+        senha
+    } = req.body;
 
     new loginDAO(req.connection)
         .login(email, senha)
         .then(result => {
-            result.auth ? res.status(200).json(result.token) : res.status(401).json(result.mensagem)
+            result.auth ?
+                res.status(200).json({
+                    token: result.token,
+                    username: result.username,
+                }) :
+                res.status(401).json(result.mensagem)
         })
         .catch(next)
-}
-);
+});
 
 
 
