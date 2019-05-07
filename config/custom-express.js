@@ -27,7 +27,7 @@ app.get('/', (req, res) => {
 app.use('/login', require('../routes/login.js'));
 app.use('/signup', require('../routes/signup.js'));
 
-app.use(AuthMiddlewares.isLoggedIn)
+// app.use(AuthMiddlewares.isLoggedIn)
 
 app.use('/pratos', require('../routes/pratos.js'));
 app.use('/favoritos', require('../routes/favoritos.js'));
