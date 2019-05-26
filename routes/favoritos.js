@@ -8,9 +8,9 @@ const pratoDAO = require('../dao/pratoDAO');
 */
 
 /*  
-*  listagem dos favoritos de um usuário
+*  listagem dos pratos favoritos de um usuário
 */
-router.get("/listar/:id", (req, res, next) => {
+router.get("/usuario/:id", (req, res, next) => {
 
     new pratoDAO(req.connection)
         .listFavoritesFromUser(req.params.id)
@@ -36,9 +36,6 @@ router.get("/:id", (req, res, next) => {
 */
 router.post("/", (req, res, next) => {
     let { prato_id } = req.body;
-
-    console.log("favoritando prato");
-    
     
     new pratoDAO(req.connection)
     .favorite(prato_id, req.user.id)

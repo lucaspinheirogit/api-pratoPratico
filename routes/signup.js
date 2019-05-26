@@ -27,6 +27,7 @@ router.post('/', (req, res, next) => {
                         result.auth ? res.status(200).json({
                             token: result.token,
                             username: result.username,
+                            role: result.role,
                         }) : res.status(401).json(result.mensagem)
                     })
                     .catch(next) :

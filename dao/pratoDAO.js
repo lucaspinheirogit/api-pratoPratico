@@ -1,3 +1,6 @@
+const mysql = require('mysql');
+const moment = require('moment');
+
 class pratosDAO {
 
     constructor(connection) {
@@ -6,10 +9,13 @@ class pratosDAO {
 
     create(nome, desc, modo, tempo, dif, dono, foto, publica) {
         return new Promise((resolve, reject) => {
-            let data = new Date().toJSON().slice(0, 10);
-            let sql = `INSERT INTO prato
-            (Nome, Descricao, ModoPreparo, TempoPreparo, Dificuldade, Dono, Foto, Public, DataCriacao)
-            VALUES ('${nome}','${desc}','${modo}','${tempo}','${dif}','${dono}','${foto}','${publica}','${data}')`;
+
+            // let data = new Date().toJSON().slice(0, 10);
+            let dataCriacao = moment().format('YYYY-MM-DD HH:mm:ss');
+
+            let sql = "INSERT INTO prato (Nome, Descricao, ModoPreparo, TempoPreparo, Dificuldade, Dono, Foto, Public, DataCriacao) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            let sqlInsert = [nome, desc, modo, tempo, dif, dono, foto, publica, dataCriacao];
+            sql = mysql.format(sql, sqlInsert);
 
             this._connection.query(sql, (err, result, fields) => {
                 if (err) return reject(err);
@@ -25,12 +31,16 @@ class pratosDAO {
                 "total": 0
             }
 
-            let sql = `SELECT * FROM prato WHERE public = '1' ORDER BY id desc LIMIT ${offset}, ${limit}`;
+            let sql = "SELECT * FROM prato WHERE public = '1' ORDER BY id desc LIMIT ?, ?";
+            let sqlInsert = [offset, limit];
+            sql = mysql.format(sql, sqlInsert);
+
             this._connection.query(sql, (err, result, fields) => {
                 if (err) return reject(err);
                 resultado.pratos = result;
 
-                let sql2 = `SELECT COUNT(*) FROM prato where public = '1'`;
+                let sql2 = "SELECT COUNT(*) FROM prato where public = '1'";
+
                 this._connection.query(sql2, (err, result, fields) => {
                     if (err) return reject(err);
                     resultado.total = result[0]['COUNT(*)'];
@@ -42,7 +52,11 @@ class pratosDAO {
 
     listFromUser(id) {
         return new Promise((resolve, reject) => {
-            let sql = `SELECT * FROM prato WHERE dono = ${id} and public = '1'`;
+
+            let sql = `SELECT * FROM prato WHERE dono = ? and public = '1'`;
+            let sqlInsert = [id];
+            sql = mysql.format(sql, sqlInsert);
+
             this._connection.query(sql, (err, result, fields) => {
                 if (err) return reject(err);
                 resolve(result);
@@ -52,7 +66,11 @@ class pratosDAO {
 
     listFavoritesFromUser(id) {
         return new Promise((resolve, reject) => {
-            let sql = `SELECT * FROM favorito INNER JOIN prato ON favorito.prato_id = prato.id WHERE usuario_id = ${id}`;
+
+            let sql = "SELECT * FROM favorito INNER JOIN prato ON favorito.prato_id = prato.id WHERE usuario_id = ?";
+            let sqlInsert = [id];
+            sql = mysql.format(sql, sqlInsert);
+
             this._connection.query(sql, (err, result, fields) => {
                 if (err) return reject(err);
                 resolve(result);
@@ -62,7 +80,11 @@ class pratosDAO {
 
     listFavoritesArrayFromUser(id) {
         return new Promise((resolve, reject) => {
-            let sql = `SELECT prato_id FROM favorito INNER JOIN prato ON favorito.prato_id = prato.id WHERE usuario_id = ${id}`;
+
+            let sql = "SELECT prato_id FROM favorito INNER JOIN prato ON favorito.prato_id = prato.id WHERE usuario_id = ?";
+            let sqlInsert = [id];
+            sql = mysql.format(sql, sqlInsert);
+
             this._connection.query(sql, (err, result, fields) => {
                 if (err) return reject(err);
                 resolve(result);
@@ -76,15 +98,21 @@ class pratosDAO {
             this.FavoritoJaExiste(prato_id, usuario_id)
                 .then(resultado => {
                     if (resultado) {
-                        console.log("Ja existe, desfavoritando");
-                        let sql = `DELETE FROM favorito WHERE prato_id='${prato_id}' AND usuario_id='${usuario_id}'`;
+
+                        let sql = "DELETE FROM favorito WHERE prato_id=? AND usuario_id=?";
+                        let sqlInsert = [prato_id, usuario_id];
+                        sql = mysql.format(sql, sqlInsert);
+
                         this._connection.query(sql, (err, result, fields) => {
                             if (err) return reject(err);
                             resolve("desfavoritado com sucesso!");
                         })
                     } else {
-                        console.log("Nao existe, favoritando");
-                        let sql = `INSERT INTO favorito (Prato_id, Usuario_id) VALUES ('${prato_id}','${usuario_id}')`;
+
+                        let sql = "INSERT INTO favorito (Prato_id, Usuario_id) VALUES (?,?)";
+                        let sqlInsert = [prato_id, usuario_id];
+                        sql = mysql.format(sql, sqlInsert);
+
                         this._connection.query(sql, (err, result, fields) => {
                             if (err) return reject(err);
                             resolve(result.insertId);
@@ -96,7 +124,11 @@ class pratosDAO {
 
     get(id) {
         return new Promise((resolve, reject) => {
-            let sql = `SELECT * FROM prato WHERE id=${id}`;
+
+            let sql = "SELECT * FROM prato WHERE id=?";
+            let sqlInsert = [id];
+            sql = mysql.format(sql, sqlInsert);
+
             this._connection.query(sql, (err, result, fields) => {
                 if (err) return reject(err);
                 resolve(result);
@@ -106,7 +138,9 @@ class pratosDAO {
 
     random() {
         return new Promise((resolve, reject) => {
-            let sql = `SELECT * FROM prato WHERE public = '1' ORDER BY RAND() LIMIT 1;`;
+
+            let sql = "SELECT * FROM prato WHERE public = '1' ORDER BY RAND() LIMIT 1";
+
             this._connection.query(sql, (err, result, fields) => {
                 if (err) return reject(err);
                 resolve(result);
@@ -116,7 +150,11 @@ class pratosDAO {
 
     FavoritoJaExiste(prato_id, usuario_id) {
         return new Promise((resolve, reject) => {
-            let sql = `SELECT * FROM favorito WHERE prato_id='${prato_id}' AND usuario_id='${usuario_id}'`;
+
+            let sql = "SELECT * FROM favorito WHERE prato_id=? AND usuario_id=?";
+            let sqlInsert = [prato_id, usuario_id];
+            sql = mysql.format(sql, sqlInsert);
+
             this._connection.query(sql, (err, result, fields) => {
                 if (err) return reject(err);
                 resolve(result.length > 0);
