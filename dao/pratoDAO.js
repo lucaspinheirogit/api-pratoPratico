@@ -10,16 +10,46 @@ class pratosDAO {
     create(nome, desc, modo, tempo, dif, dono, foto, publica) {
         return new Promise((resolve, reject) => {
 
-            // let data = new Date().toJSON().slice(0, 10);
             let dataCriacao = moment().format('YYYY-MM-DD HH:mm:ss');
 
-            let sql = "INSERT INTO prato (Nome, Descricao, ModoPreparo, TempoPreparo, Dificuldade, Dono, Foto, Public, DataCriacao) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            let sqlInsert = [nome, desc, modo, tempo, dif, dono, foto, publica, dataCriacao];
+            let sql = "INSERT INTO prato (Nome, Descricao, ModoPreparo, TempoPreparo, Dificuldade, Dono, Foto, Public, DataCriacao, Visible) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            let sqlInsert = [nome, desc, modo, tempo, dif, dono, foto, publica, dataCriacao, true];
             sql = mysql.format(sql, sqlInsert);
 
             this._connection.query(sql, (err, result, fields) => {
                 if (err) return reject(err);
                 resolve(result.insertId);
+            })
+        });
+    }
+
+    update(id, nome, desc, modo, tempo, dif, dono, foto, publica) {
+        return new Promise((resolve, reject) => {
+
+            let dataCriacao = moment().format('YYYY-MM-DD HH:mm:ss');
+
+            let sql = "UPDATE prato SET nome=?, descricao=?, modopreparo=?, tempopreparo=?, dificuldade=?, dono=?, foto=?, public=?, datacriacao=? where id=?";
+            let sqlInsert = [nome, desc, modo, tempo, dif, dono, foto, publica, dataCriacao, id];
+            sql = mysql.format(sql, sqlInsert);
+
+            this._connection.query(sql, (err, result, fields) => {
+                if (err) return reject(err);
+                resolve({ message: "Prato atualizado com sucesso!" });
+            })
+        });
+    }
+
+    delete(id) {
+        return new Promise((resolve, reject) => {
+            let dataAtualizacao = moment().format('YYYY-MM-DD HH:mm:ss');
+
+            let sql = "UPDATE prato SET visible=false, updated_at=? where id = ?"
+            let sqlInsert = [dataAtualizacao, id];
+            sql = mysql.format(sql, sqlInsert);
+
+            this._connection.query(sql, (err, result, fields) => {
+                if (err) return reject(err);
+                resolve({ message: "Prato excluído com sucesso!" });
             })
         });
     }

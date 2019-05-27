@@ -1,4 +1,4 @@
-const unidades = {
+const unidades = Object.freeze({
     COPO: 'copo',
     XICARA: 'xícara',
     XICARA_CHA: 'xícara de chá',
@@ -17,6 +17,6 @@ const unidades = {
     MACO: 'maço',
     CONCHA: 'concha',
     PRATO: 'prato'
-}
+})
 
 module.exports = unidades;

@@ -1,12 +1,81 @@
 const express = require('express');
 const router = express.Router();
-const dificuldadeEnum = require('../enums/dificuldade');
+const AuthMiddlewares = require('../auth');
 
 const pratoDAO = require('../dao/pratoDAO');
 const ingredienteDAO = require('../dao/ingredienteDAO');
 
+const helper = require('../helpers')
+
 /*  
 !   /pratos
+*/
+
+/*  
+*  Criação de um novo prato
+*/
+router.post("/", AuthMiddlewares.isLoggedIn, (req, res, next) => {
+    let { nome, descricao, modo, tempo, dificuldade, foto, publica, ingredientes } = req.body;
+    let dono = req.user.id;
+
+    let validouDificuldade = helper.validaDificuldade(dificuldade);
+    let validouIngredientes = helper.validaIngredientes(ingredientes);
+
+    if (!validouDificuldade || !validouIngredientes) {
+        res.status(400).json({ "message": "Dados incorretos" });
+    } else {
+
+        new pratoDAO(req.connection)
+            .create(nome, descricao, modo, tempo, dificuldade, dono, foto, publica)
+            .then(pratoId => {
+
+                ingredientes.forEach(ingrediente => {
+                    let { nome, quantidade, unidadeMedida } = ingrediente;
+
+                    new ingredienteDAO(req.connection)
+                        .create(pratoId, nome, quantidade, unidadeMedida)
+                        .then(result => {
+                        })
+                        .catch(next)
+                });
+
+            })
+            .catch(next)
+
+        res.json({ "message": "Prato cadastrado com sucesso" });
+    }
+});
+
+/*
+*  Atualizar um prato
+*/
+router.put("/:id/update", AuthMiddlewares.isLoggedIn, (req, res, next) => {
+    let { nome, descricao, modo, tempo, dificuldade, foto, publica, ingredientes } = req.body;
+    let dono = req.user.id;
+
+    let validouDificuldade = helper.validaDificuldade(dificuldade);
+    let validouIngredientes = helper.validaIngredientes(ingredientes);
+
+    if (!validouDificuldade || !validouIngredientes) {
+        res.status(400).json({ "message": "Dados incorretos" });
+    } else {
+
+        new pratoDAO(req.connection)
+            .create(nome, descricao, modo, tempo, dificuldade, dono, foto, publica)
+            .then(result => pratoId = result)
+            .catch(next)
+    }
+});
+
+/*  
+*  Deletar um prato
+
+router.delete("/:id/delete", AuthMiddlewares.isLoggedIn, (req, res, next) => {
+    new forumDAO(req.connection)
+        .delete(req.params.id)
+        .then(response => res.json(response))
+        .catch(next)
+});
 */
 
 /*  
@@ -35,36 +104,10 @@ router.get("/", (req, res, next) => {
 });
 
 /*  
-*  Criação de um novo prato
-*/
-router.post("/", (req, res, next) => {
-    let { nome, descricao, modo, tempo, dificuldade, foto, publica, ingredientes } = req.body;
-    dificuldade = dificuldadeEnum.MEDIO;
-    //let dono = req.user.id;
-    let dono = 1;
-
-    new pratoDAO(req.connection)
-        .create(nome, descricao, modo, tempo, dificuldade, dono, foto, publica)
-        .then(result => pratoId = result)
-        .catch(next)
-
-    ingredientes.forEach(ingrediente => {
-        new ingredienteDAO(req.connection)
-            .create(ingrediente.nome)
-            .then(result => {
-            })
-            .catch(next)
-    });
-
-    res.json({ "message": "Prato cadastrado com sucesso" });
-});
-
-
-/*  
 *  Listar um prato específico
 */
 router.get("/detalhe/:id", (req, res, next) => {
-    let {id} = req.params;
+    let { id } = req.params;
     new pratoDAO(req.connection)
         .get(id)
         .then(prato => res.json(prato))
@@ -75,7 +118,7 @@ router.get("/detalhe/:id", (req, res, next) => {
 *  Listar os pratos de um usuário específico
 */
 router.get("/usuario/:id", (req, res, next) => {
-    let {id} = req.params;
+    let { id } = req.params;
     new pratoDAO(req.connection)
         .listFromUser(id)
         .then(prato => res.json(prato))
