@@ -8,7 +8,6 @@ module.exports = {
                 jwt.verify(token, process.env.SECRET, (error, user) => {
                     if (error) throw error;
                     req.user = user;
-                    console.log("AUTORIZADO");
                     next();
                 });
             } else {
@@ -19,13 +18,11 @@ module.exports = {
         }
     },
     isLoggedIn: function (req, res, next) {
-        console.log(req.user === undefined);
-
         if (req.user === undefined) {
-            res.status(401); next(new Error('Unauthorized'));
+            res.status(401);
+            next(new Error('Unauthorized'));
         } else {
             next()
         }
-
     }
 }

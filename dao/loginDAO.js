@@ -73,7 +73,7 @@ class loginDAO {
                     let hash = bcrypt.hashSync(senha, 3);
                     let dataCriacao = moment().format('YYYY-MM-DD HH:mm:ss');
 
-                    let sql = "INSERT INTO usuario (nome, email, senha, created_at) VALUES (?, ?, ?, ?)";
+                    let sql = "INSERT INTO usuario (nome, email, senha, dataCriacao) VALUES (?, ?, ?, ?)";
                     let sqlInsert = [nome, email, hash, dataCriacao];
                     sql = mysql.format(sql, sqlInsert);
 

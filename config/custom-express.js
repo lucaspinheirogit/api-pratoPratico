@@ -20,19 +20,12 @@ app.use((req, res, next) => {
     next();
 });
 
-app.get('/', (req, res) => {
-    throw new Error("teste erro!");
-  });
-
-app.use('/login', require('../routes/login.js'));
-app.use('/signup', require('../routes/signup.js'));
-
-// app.use(AuthMiddlewares.isLoggedIn)
+app.use('/auth', require('../routes/auth.js'));
+app.use('/usuarios', AuthMiddlewares.isLoggedIn, require('../routes/usuarios.js'));
 
 app.use('/pratos', require('../routes/pratos.js'));
 app.use('/favoritos', require('../routes/favoritos.js'));
 app.use('/ingredientes', require('../routes/ingredientes.js'));
-app.use('/usuarios', require('../routes/usuarios.js'));
 
 function notFound(req, res, next) {
     res.status(404);

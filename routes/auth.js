@@ -4,18 +4,35 @@ const router = express.Router();
 const loginDAO = require('../dao/loginDAO');
 
 /*  
-!   /signup
+!   /auth
 */
+
+/*  
+*  Logar checando se o email/senha estão corretos
+*/
+
+router.post('/login', (req, res, next) => {
+    let { email, senha } = req.body;
+
+    new loginDAO(req.connection)
+        .login(email, senha)
+        .then(result => {
+            result.auth ?
+                res.status(200).json({
+                    token: result.token,
+                    username: result.username,
+                    role: result.role,
+                }) :
+                res.status(401).json(result.mensagem)
+        })
+        .catch(next)
+});
 
 /*  
 *  Cadastrar checando se o email não está cadastrado já
 */
-router.post('/', (req, res, next) => {
-    let {
-        nome,
-        email,
-        senha
-    } = req.body;
+router.post('/signup', (req, res, next) => {
+    let { nome, email, senha } = req.body;
 
     new loginDAO(req.connection)
         .signup(nome, email, senha)
@@ -35,5 +52,8 @@ router.post('/', (req, res, next) => {
         })
         .catch(next)
 });
+
+
+
 
 module.exports = router;
