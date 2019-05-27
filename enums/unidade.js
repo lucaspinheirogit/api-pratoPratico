@@ -1,4 +1,6 @@
-const unidades = Object.freeze({
+const unidades = {
+    GRAMAS: 'gramas (g)',
+    QUILOGRAMAS: 'quilogramas (kg)',
     COPO: 'copo',
     XICARA: 'xícara',
     XICARA_CHA: 'xícara de chá',
@@ -17,6 +19,6 @@ const unidades = Object.freeze({
     MACO: 'maço',
     CONCHA: 'concha',
     PRATO: 'prato'
-})
+}
 
 module.exports = unidades;

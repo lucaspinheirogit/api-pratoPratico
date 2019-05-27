@@ -1,8 +1,10 @@
 const dificuldades = {
+    MUITO_FACIL: 'Muito fácil',
     FACIL: 'Fácil',
-    MEDIO: 'Médio',
+    MEDIA: 'Média',
     DIFICIL: 'Difícil',
-    MUITO_DIFICIL: 'Muito difícil'
+    MUITO_DIFICIL: 'Muito difícil',
+    MASTERCHEF: 'Masterchef',
 }
 
 module.exports = dificuldades;

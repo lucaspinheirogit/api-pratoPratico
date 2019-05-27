@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const AuthMiddlewares = require('../auth');
+const helper = require('../helpers')
 
 const pratoDAO = require('../dao/pratoDAO');
 const ingredienteDAO = require('../dao/ingredienteDAO');
-
-const helper = require('../helpers')
 
 /*  
 !   /pratos
@@ -34,8 +33,7 @@ router.post("/", AuthMiddlewares.isLoggedIn, (req, res, next) => {
 
                     new ingredienteDAO(req.connection)
                         .create(pratoId, nome, quantidade, unidadeMedida)
-                        .then(result => {
-                        })
+                        .then(result => { })
                         .catch(next)
                 });
 
