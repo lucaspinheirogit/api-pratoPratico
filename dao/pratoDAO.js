@@ -26,10 +26,10 @@ class pratosDAO {
     update(id, nome, desc, modo, tempo, dif, dono, foto, publica) {
         return new Promise((resolve, reject) => {
 
-            let dataCriacao = moment().format('YYYY-MM-DD HH:mm:ss');
+            let dataAtualizacao = moment().format('YYYY-MM-DD HH:mm:ss');
 
-            let sql = "UPDATE prato SET nome=?, descricao=?, modopreparo=?, tempopreparo=?, dificuldade=?, dono=?, foto=?, public=?, datacriacao=? where id=?";
-            let sqlInsert = [nome, desc, modo, tempo, dif, dono, foto, publica, dataCriacao, id];
+            let sql = "UPDATE prato SET nome=?, descricao=?, modopreparo=?, tempopreparo=?, dificuldade=?, dono=?, foto=?, public=?, dataAtualizacao=? where id=?";
+            let sqlInsert = [nome, desc, modo, tempo, dif, dono, foto, publica, dataAtualizacao, id];
             sql = mysql.format(sql, sqlInsert);
 
             this._connection.query(sql, (err, result, fields) => {
@@ -60,7 +60,7 @@ class pratosDAO {
             let sql = "DELETE pi.* FROM prato_ingrediente pi INNER JOIN prato p on p.id = pi.Prato_id WHERE p.id = ? and p.dono = ? and pi.ingrediente_id = ?"
             let sqlInsert = [prato_id, usuario_id, ingrediente_id];
             sql = mysql.format(sql, sqlInsert);
-            
+
             this._connection.query(sql, (err, result, fields) => {
                 if (err) return reject(err);
                 resolve({ message: "Ingrediente excluído com sucesso!" });

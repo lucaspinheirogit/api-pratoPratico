@@ -59,7 +59,7 @@ router.put("/:id/update", AuthMiddlewares.isLoggedIn, (req, res, next) => {
 
         new pratoDAO(req.connection)
             .update(req.params.id, nome, descricao, modo, tempo, dificuldade, dono, foto, publica)
-            .then(result => pratoId = result)
+            .then(result => res.json(result))
             .catch(next)
     }
 });
