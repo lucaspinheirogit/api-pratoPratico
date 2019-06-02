@@ -11,6 +11,7 @@ const unidades = {
     COLHER_SOBREMESA: 'colher de sobremesa',
     FATIA: 'fatia',
     UNIDADE: 'unidade',
+    ITEM: 'item',
     FILE: 'filé',
     BIFE: 'bife',
     PORCAO: 'porção',

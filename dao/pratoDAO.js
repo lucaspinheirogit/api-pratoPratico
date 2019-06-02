@@ -54,6 +54,20 @@ class pratosDAO {
         });
     }
 
+    deleteIngredient(prato_id, ingrediente_id, usuario_id) {
+        return new Promise((resolve, reject) => {
+
+            let sql = "DELETE pi.* FROM prato_ingrediente pi INNER JOIN prato p on p.id = pi.Prato_id WHERE p.id = ? and p.dono = ? and pi.ingrediente_id = ?"
+            let sqlInsert = [prato_id, usuario_id, ingrediente_id];
+            sql = mysql.format(sql, sqlInsert);
+            
+            this._connection.query(sql, (err, result, fields) => {
+                if (err) return reject(err);
+                resolve({ message: "Ingrediente excluído com sucesso!" });
+            })
+        });
+    }
+
     list(offset, limit) {
         return new Promise((resolve, reject) => {
             let resultado = {

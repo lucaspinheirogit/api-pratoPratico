@@ -48,18 +48,17 @@ router.post("/", AuthMiddlewares.isLoggedIn, (req, res, next) => {
 *  Atualizar um prato
 */
 router.put("/:id/update", AuthMiddlewares.isLoggedIn, (req, res, next) => {
-    let { nome, descricao, modo, tempo, dificuldade, foto, publica, ingredientes } = req.body;
+    let { nome, descricao, modo, tempo, dificuldade, foto, publica } = req.body;
     let dono = req.user.id;
 
     let validouDificuldade = helper.validaDificuldade(dificuldade);
-    let validouIngredientes = helper.validaIngredientes(ingredientes);
 
-    if (!validouDificuldade || !validouIngredientes) {
+    if (!validouDificuldade) {
         res.status(400).json({ "message": "Dados incorretos" });
     } else {
 
         new pratoDAO(req.connection)
-            .create(nome, descricao, modo, tempo, dificuldade, dono, foto, publica)
+            .update(req.params.id, nome, descricao, modo, tempo, dificuldade, dono, foto, publica)
             .then(result => pratoId = result)
             .catch(next)
     }
@@ -75,6 +74,20 @@ router.delete("/:id/delete", AuthMiddlewares.isLoggedIn, (req, res, next) => {
         .catch(next)
 });
 */
+
+/*  
+*  Deletar um ingrediente de um prato
+*/
+router.delete("/:id/ingredient/:ingrediente_id/delete/", AuthMiddlewares.isLoggedIn, (req, res, next) => {
+    let dono = req.user.id;
+    let { id, ingrediente_id } = req.params;
+
+    new pratoDAO(req.connection)
+        .deleteIngredient(id, ingrediente_id, dono)
+        .then(result => res.json(result))
+        .catch(next)
+
+});
 
 /*  
 *  listagem de todos os pratos com paginacao opcional (Offset e limit)

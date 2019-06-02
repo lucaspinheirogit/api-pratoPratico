@@ -54,8 +54,10 @@ class loginDAO {
         });
     }
 
-    signup(nome, email, senha) {
+    signup(nome, img, email, senha) {
         return new Promise((resolve, reject) => {
+
+            //TODO: SALVAR IMAGEM NO FIREBASE OU AMAZON AWS E SALVAR O LINK DA IMG
 
             let sql = "SELECT * FROM usuario WHERE email=?";
             let sqlInsert = [email];
@@ -73,8 +75,8 @@ class loginDAO {
                     let hash = bcrypt.hashSync(senha, 3);
                     let dataCriacao = moment().format('YYYY-MM-DD HH:mm:ss');
 
-                    let sql = "INSERT INTO usuario (nome, email, senha, dataCriacao) VALUES (?, ?, ?, ?)";
-                    let sqlInsert = [nome, email, hash, dataCriacao];
+                    let sql = "INSERT INTO usuario (nome, img, email, senha, dataCriacao) VALUES (?, ?, ?, ?, ?)";
+                    let sqlInsert = [nome, img, email, hash, dataCriacao];
                     sql = mysql.format(sql, sqlInsert);
 
                     this._connection.query(sql, function (err, result) {

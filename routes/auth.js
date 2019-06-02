@@ -32,10 +32,10 @@ router.post('/login', (req, res, next) => {
 *  Cadastrar checando se o email não está cadastrado já
 */
 router.post('/signup', (req, res, next) => {
-    let { nome, email, senha } = req.body;
+    let { nome, img, email, senha } = req.body;
 
     new loginDAO(req.connection)
-        .signup(nome, email, senha)
+        .signup(nome, img, email, senha)
         .then(result => {
             result.auth ?
                 new loginDAO(req.connection)

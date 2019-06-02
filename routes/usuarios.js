@@ -15,6 +15,19 @@ router.get("/", (req, res, next) => {
         .get(req.user.id)
         .then(result => res.json(result))
         .catch(next)
-}); 
+});
+
+/*  
+*  alteração dos dados do usuário
+*/
+router.put("/", (req, res, next) => {
+
+    let { nome, senha, img } = req.body;
+
+    new usuarioDAO(req.connection)
+        .update(req.user.id, nome, senha, img)
+        .then(result => res.json(result))
+        .catch(next)
+});
 
 module.exports = router;
