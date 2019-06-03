@@ -66,14 +66,13 @@ router.put("/:id/update", AuthMiddlewares.isLoggedIn, (req, res, next) => {
 
 /*  
 *  Deletar um prato
-
+*/
 router.delete("/:id/delete", AuthMiddlewares.isLoggedIn, (req, res, next) => {
-    new forumDAO(req.connection)
-        .delete(req.params.id)
+    new pratoDAO(req.connection)
+        .delete(req.params.id, req.user.id)
         .then(response => res.json(response))
         .catch(next)
 });
-*/
 
 /*  
 *  Deletar um ingrediente de um prato
@@ -87,6 +86,16 @@ router.delete("/:id/ingredient/:ingrediente_id/delete/", AuthMiddlewares.isLogge
         .then(result => res.json(result))
         .catch(next)
 
+});
+
+/*  
+*  Tornar um prato privado, ou publico caso esteja privado
+*/
+router.delete("/:id/private", AuthMiddlewares.isLoggedIn, (req, res, next) => {
+    new pratoDAO(req.connection)
+        .private(req.params.id, req.user.id)
+        .then(response => res.json(response))
+        .catch(next)
 });
 
 /*  

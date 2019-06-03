@@ -39,12 +39,12 @@ class pratosDAO {
         });
     }
 
-    delete(id) {
+    delete(id, usuarioId) {
         return new Promise((resolve, reject) => {
             let dataAtualizacao = moment().format('YYYY-MM-DD HH:mm:ss');
 
-            let sql = "UPDATE prato SET visible=false, updated_at=? where id = ?"
-            let sqlInsert = [dataAtualizacao, id];
+            let sql = "UPDATE prato SET visible=false, dataAtualizacao=? where id=? and dono=?"
+            let sqlInsert = [dataAtualizacao, id, usuarioId];
             sql = mysql.format(sql, sqlInsert);
 
             this._connection.query(sql, (err, result, fields) => {
@@ -64,6 +64,21 @@ class pratosDAO {
             this._connection.query(sql, (err, result, fields) => {
                 if (err) return reject(err);
                 resolve({ message: "Ingrediente excluído com sucesso!" });
+            })
+        });
+    }
+
+    private(id, usuarioId) {
+        return new Promise((resolve, reject) => {
+            let dataAtualizacao = moment().format('YYYY-MM-DD HH:mm:ss');
+
+            let sql = "UPDATE prato SET public= NOT public, dataAtualizacao=? where id=? and dono=?"
+            let sqlInsert = [dataAtualizacao, id, usuarioId];
+            sql = mysql.format(sql, sqlInsert);
+
+            this._connection.query(sql, (err, result, fields) => {
+                if (err) return reject(err);
+                resolve({ message: "Prato atualizado com sucesso!" });
             })
         });
     }

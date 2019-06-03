@@ -24,5 +24,15 @@ module.exports = {
         } else {
             next()
         }
+    },
+
+    isAdmin: function (req, res, next) {
+        if (req.user === undefined) {
+            res.status(401); next(new Error('Não autorizado! faça login para continuar...'));
+        } else if (req.user.role !== 'admin') {
+            res.status(401); next(new Error('Não autorizado!'));
+        } else {
+            next()
+        }
     }
 }

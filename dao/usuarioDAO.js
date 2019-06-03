@@ -7,6 +7,18 @@ class usuariosDAO {
         this._connection = connection;
     }
 
+    list() {
+        return new Promise((resolve, reject) => {
+
+            let sql = "SELECT * FROM usuario";
+
+            this._connection.query(sql, (err, result, fields) => {
+                if (err) return reject(err);
+                resolve(result);
+            })
+        });
+    }
+
     get(id) {
         return new Promise((resolve, reject) => {
 
@@ -16,7 +28,7 @@ class usuariosDAO {
 
             this._connection.query(sql, (err, result, fields) => {
                 if (err) return reject(err);
-                resolve(result);
+                resolve(result[0]);
             })
         });
     }
@@ -27,9 +39,10 @@ class usuariosDAO {
             //TODO: SALVAR IMAGEM NO FIREBASE OU AMAZON AWS E SALVAR O LINK DA IMG
 
             let dataAtualizacao = moment().format('YYYY-MM-DD HH:mm:ss');
+            let hash = bcrypt.hashSync(senha, 3);
 
             let sql = "UPDATE usuario SET nome=?, senha=?, img=?, dataAtualizacao=? where id=?";
-            let sqlInsert = [nome, senha, img, dataAtualizacao, id];
+            let sqlInsert = [nome, hash, img, dataAtualizacao, id];
             sql = mysql.format(sql, sqlInsert);
 
             this._connection.query(sql, (err, result, fields) => {
