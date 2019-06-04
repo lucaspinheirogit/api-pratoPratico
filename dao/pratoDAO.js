@@ -90,9 +90,9 @@ class pratosDAO {
                 "total": 0
             }
 
-            let sql = "SELECT * FROM prato WHERE public = '1' ORDER BY id desc LIMIT ?, ?";
-            let sqlInsert = [offset, limit];
-            sql = mysql.format(sql, sqlInsert);
+            let sql = `SELECT * FROM prato WHERE public = '1' ORDER BY id desc LIMIT ${offset}, ${limit}`;
+            // let sqlInsert = [offset, limit];
+            // sql = mysql.format(sql, sqlInsert);
 
             this._connection.query(sql, (err, result, fields) => {
                 if (err) return reject(err);

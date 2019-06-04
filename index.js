@@ -9,7 +9,7 @@ setInterval(function () {
             console.log(body);
         }
     });
-}, 1500000); // sends a GET request every 25 minutes (1500000) to maintain the app awake
+}, 1500000); //sends a GET request every 25 minutes (1500000) to maintain the app awake
 */
 
 app.listen(process.env.PORT || 5000);
