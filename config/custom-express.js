@@ -27,6 +27,10 @@ app.use('/pratos', require('../routes/pratos.js'));
 app.use('/favoritos', require('../routes/favoritos.js'));
 app.use('/ingredientes', require('../routes/ingredientes.js'));
 
+
+
+app.use('/images', require('../routes/images.js'));
+
 function notFound(req, res, next) {
     res.status(404);
     next(new Error('Not Found - ' + req.originalUrl));
