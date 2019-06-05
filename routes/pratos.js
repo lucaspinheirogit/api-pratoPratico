@@ -53,6 +53,7 @@ router.post("/", AuthMiddlewares.isLoggedIn, (req, res, next) => {
 });
 
 /*
+TODO Atualizar a foto tambem
 *  Atualizar um prato
 */
 router.put("/:id/update", AuthMiddlewares.isLoggedIn, (req, res, next) => {
@@ -156,12 +157,12 @@ router.get("/usuario/:id", (req, res, next) => {
 /*  
 *  Listar um prato aleatoriamente escolhido
 */
-router.get("/random", (req, res, next) =>
+router.get("/random", (req, res, next) => {
     new pratoDAO(req.connection)
         .random()
         .then(prato => res.json(prato))
         .catch(next)
-);
+});
 
 
 
