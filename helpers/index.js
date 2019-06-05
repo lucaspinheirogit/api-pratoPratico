@@ -39,7 +39,6 @@ module.exports = {
             }
             let newFileName = `${nome}-${usuario}_${Date.now()}`;
             console.log(newFileName);
-            
 
             let fileUpload = bucket.file(newFileName);
 
@@ -50,7 +49,7 @@ module.exports = {
             });
 
             blobStream.on('error', (error) => {
-                reject('Something is wrong! Unable to upload at the moment.');
+                reject('Erro! Por favor tente novamente.');
             });
 
             blobStream.on('finish', async () => {

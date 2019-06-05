@@ -34,10 +34,10 @@ router.get("/", AuthMiddlewares.isLoggedIn, (req, res, next) => {
 */
 router.put("/", AuthMiddlewares.isLoggedIn, (req, res, next) => {
 
-    let { nome, senha, img } = req.body;
+    let { nome, senha, img, imgNome } = req.body;
 
     new usuarioDAO(req.connection)
-        .update(req.user.id, nome, senha, img)
+        .update(req.user.id, nome, senha, img, imgNome)
         .then(result => res.json(result))
         .catch(next)
 });
