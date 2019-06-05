@@ -14,7 +14,7 @@ const ingredienteDAO = require('../dao/ingredienteDAO');
 *  Criação de um novo prato
 */
 router.post("/", AuthMiddlewares.isLoggedIn, (req, res, next) => {
-    let { nome, descricao, modo, tempo, dificuldade, foto, publica, ingredientes } = req.body;
+    let { nome, descricao, modo, tempo, dificuldade, foto, fotoNome, publica, ingredientes } = req.body;
     let dono = req.user.id;
 
     let validouDificuldade = helper.validaDificuldade(dificuldade);
@@ -24,23 +24,31 @@ router.post("/", AuthMiddlewares.isLoggedIn, (req, res, next) => {
         res.status(400).json({ "message": "Dados incorretos" });
     } else {
 
-        new pratoDAO(req.connection)
-            .create(nome, descricao, modo, tempo, dificuldade, dono, foto, publica)
-            .then(pratoId => {
+        if (foto) {
+            img = helper.base64ImageToBlob(foto);
+            helper.uploadImageGetUrl(img, fotoNome, req.user.username).then((url) => {
 
-                ingredientes.forEach(ingrediente => {
-                    let { nome, quantidade, unidadeMedida } = ingrediente;
+                new pratoDAO(req.connection)
+                    .create(nome, descricao, modo, tempo, dificuldade, dono, url, publica)
+                    .then(pratoId => {
 
-                    new ingredienteDAO(req.connection)
-                        .create(pratoId, nome, quantidade, unidadeMedida)
-                        .then(result => { })
-                        .catch(next)
-                });
+                        ingredientes.forEach(ingrediente => {
+                            let { nome, quantidade, unidadeMedida } = ingrediente;
+
+                            new ingredienteDAO(req.connection)
+                                .create(pratoId, nome, quantidade, unidadeMedida)
+                                .then(result => { })
+                                .catch(next)
+                        });
+
+                    })
+                    .catch(next)
+
+                res.json({ "message": "Prato cadastrado com sucesso" });
 
             })
-            .catch(next)
-
-        res.json({ "message": "Prato cadastrado com sucesso" });
+                .catch(next)
+        }
     }
 });
 

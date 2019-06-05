@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
+const helper = require('../helpers');
 const loginDAO = require('../dao/loginDAO');
 
 /*  
@@ -32,10 +33,10 @@ router.post('/login', (req, res, next) => {
 *  Cadastrar checando se o email não está cadastrado já
 */
 router.post('/signup', (req, res, next) => {
-    let { nome, img, email, senha } = req.body;
+    let { nome, img, imgNome, email, senha } = req.body;
 
     new loginDAO(req.connection)
-        .signup(nome, img, email, senha)
+        .signup(nome, img, imgNome, email, senha)
         .then(result => {
             result.auth ?
                 new loginDAO(req.connection)
