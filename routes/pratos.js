@@ -15,10 +15,10 @@ const ingredienteDAO = require('../dao/ingredienteDAO');
 /*  
 *  Buscar pratos
 */
-router.get("/search", (req, res, next) => {
-    const { nome, tempo, dificuldade } = req.query;
+router.post("/search", (req, res, next) => {
+    const { nome, tempo, dificuldade, ingredientes } = req.body;
     
-    queries.search({nome, tempo, dificuldade}).then(pratos => res.json(pratos))
+    queries.search({nome, tempo, dificuldade, ingredientes}).then(pratos => res.json(pratos))
 })
 
 /*  
