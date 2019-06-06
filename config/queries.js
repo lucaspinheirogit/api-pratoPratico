@@ -18,14 +18,20 @@ module.exports = {
     search: async (query) => {
         let knexQuery = knex('prato')
 
+        //Se nome foi informado, buscar pratos com aquele nome 
         if (query.nome) knexQuery.where('nome', 'like', `%${query.nome}%`)
+
+        //Se tempo foi informado, buscar pratos com aquele nome 
         if (query.tempo) knexQuery.where('tempoPreparo', 'like', `%${query.tempo}%`)
 
-        knexQuery.where('visible', true)
+        knexQuery.where('public', true) // Sempre buscar pratos públicos
+        knexQuery.where('visible', true) // Sempre buscar pratos visiveis
 
+        //Se Ingredientes foram informados, buscar pratos com aqueles ingredientes 
         if (query.ingredientes) {
             let ingredientes = [];
 
+            //Para cada ingrediente, checa se o mesmo existe e poe na variavel ingredientes
             for (let j = 0; j < query.ingredientes.length; j++) {
                 let ingredientesQuery = knex('ingrediente')
                 ingredientesQuery.where('nome', query.ingredientes[j].nome)
@@ -38,6 +44,7 @@ module.exports = {
             let pratos = await knexQuery;
             var resultado = [];
 
+            //Para cada prato, checa se os ingredientes pertencem a ele
             for (let i = 0; i < pratos.length; i++) {
                 let prato = pratos[i];
 
@@ -49,6 +56,8 @@ module.exports = {
                     PratoIngredienteQuery.where("ingrediente_id", ingrediente.Id)
                     PratoIngredienteQuery.innerJoin("prato", "prato_ingrediente.prato_id", "prato.id")
 
+                    //Pega a tabela prato_ingrediente e checa se o prato(id) e o ingrediente(id) dao match 
+
                     let res = await PratoIngredienteQuery;
                     if (res.length > 0) {
                         resultado.push(res[0])
@@ -56,8 +65,7 @@ module.exports = {
                 }
             }
 
-            let resultadoUnico = getUnique(resultado, 'Id');
-            
+            let resultadoUnico = getUnique(resultado, 'Id'); //remove os elementos duplicados do array de pratos
             return new Promise(function(resolve, reject) {
                 resolve(resultadoUnico)
             })
