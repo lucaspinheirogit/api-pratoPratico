@@ -24,40 +24,34 @@ router.post("/", AuthMiddlewares.isLoggedIn, (req, res, next) => {
         res.status(400).json({ "message": "Dados incorretos" });
     } else {
 
-        if (foto) {
-            img = helper.base64ImageToBlob(foto);
-            helper.uploadImageGetUrl(img, fotoNome, req.user.username).then((url) => {
 
-                new pratoDAO(req.connection)
-                    .create(nome, descricao, modo, tempo, dificuldade, dono, url, publica)
-                    .then(pratoId => {
+        new pratoDAO(req.connection)
+            .create(nome, descricao, modo, tempo, dificuldade, dono, foto, fotoNome, publica)
+            .then(pratoId => {
 
-                        ingredientes.forEach(ingrediente => {
-                            let { nome, quantidade, unidadeMedida } = ingrediente;
+                ingredientes.forEach(ingrediente => {
+                    let { nome, quantidade, unidadeMedida } = ingrediente;
 
-                            new ingredienteDAO(req.connection)
-                                .create(pratoId, nome, quantidade, unidadeMedida)
-                                .then(result => { })
-                                .catch(next)
-                        });
-
-                    })
-                    .catch(next)
-
-                res.json({ "message": "Prato cadastrado com sucesso" });
+                    new ingredienteDAO(req.connection)
+                        .create(pratoId, nome, quantidade, unidadeMedida)
+                        .then(result => { })
+                        .catch(next)
+                });
 
             })
-                .catch(next)
-        }
+            .catch(next)
+
+        res.json({ "message": "Prato cadastrado com sucesso" });
+
+
     }
 });
 
 /*
-TODO Atualizar a foto tambem
 *  Atualizar um prato
 */
 router.put("/:id/update", AuthMiddlewares.isLoggedIn, (req, res, next) => {
-    let { nome, descricao, modo, tempo, dificuldade, foto, publica } = req.body;
+    let { nome, descricao, modo, tempo, dificuldade, foto, fotoNome, publica } = req.body;
     let dono = req.user.id;
 
     let validouDificuldade = helper.validaDificuldade(dificuldade);
@@ -67,7 +61,7 @@ router.put("/:id/update", AuthMiddlewares.isLoggedIn, (req, res, next) => {
     } else {
 
         new pratoDAO(req.connection)
-            .update(req.params.id, nome, descricao, modo, tempo, dificuldade, dono, foto, publica)
+            .update(req.params.id, nome, descricao, modo, tempo, dificuldade, dono, foto, fotoNome, publica)
             .then(result => res.json(result))
             .catch(next)
     }

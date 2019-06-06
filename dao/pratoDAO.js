@@ -1,5 +1,6 @@
 const mysql = require('mysql');
 const moment = require('moment');
+const helper = require('../helpers');
 
 class pratosDAO {
 
@@ -7,35 +8,55 @@ class pratosDAO {
         this._connection = connection;
     }
 
-    create(nome, desc, modo, tempo, dif, dono, foto, publica) {
+    create(nome, desc, modo, tempo, dif, dono, foto, fotoNome, publica) {
         return new Promise((resolve, reject) => {
 
             let dataCriacao = moment().format('YYYY-MM-DD HH:mm:ss');
 
-            let sql = "INSERT INTO prato (Nome, Descricao, ModoPreparo, TempoPreparo, Dificuldade, Dono, Foto, Public, DataCriacao, Visible) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            let sqlInsert = [nome, desc, modo, tempo, dif, dono, foto, publica, dataCriacao, true];
-            sql = mysql.format(sql, sqlInsert);
+            let img = helper.base64ImageToBlob(foto);
+            helper.uploadImageGetUrl(img, fotoNome, dono).then((url) => {
 
-            this._connection.query(sql, (err, result, fields) => {
-                if (err) return reject(err);
-                resolve(result.insertId);
+                let sql = "INSERT INTO prato (Nome, Descricao, ModoPreparo, TempoPreparo, Dificuldade, Dono, Foto, Public, DataCriacao, Visible) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                let sqlInsert = [nome, desc, modo, tempo, dif, dono, url, publica, dataCriacao, true];
+                sql = mysql.format(sql, sqlInsert);
+
+                this._connection.query(sql, (err, result, fields) => {
+                    if (err) return reject(err);
+                    resolve(result.insertId);
+                })
+
             })
         });
     }
 
-    update(id, nome, desc, modo, tempo, dif, dono, foto, publica) {
+    update(id, nome, desc, modo, tempo, dif, dono, foto, fotoNome, publica) {
         return new Promise((resolve, reject) => {
 
             let dataAtualizacao = moment().format('YYYY-MM-DD HH:mm:ss');
 
-            let sql = "UPDATE prato SET nome=?, descricao=?, modopreparo=?, tempopreparo=?, dificuldade=?, dono=?, foto=?, public=?, dataAtualizacao=? where id=?";
-            let sqlInsert = [nome, desc, modo, tempo, dif, dono, foto, publica, dataAtualizacao, id];
-            sql = mysql.format(sql, sqlInsert);
+            if (foto) {
+                let img = helper.base64ImageToBlob(foto);
+                helper.uploadImageGetUrl(img, fotoNome, dono).then((url) => {
+                    let sql = "UPDATE prato SET nome=?, descricao=?, modopreparo=?, tempopreparo=?, dificuldade=?, foto=?, public=?, dataAtualizacao=? where id=? and dono=?";
+                    let sqlInsert = [nome, desc, modo, tempo, dif, url, publica, dataAtualizacao, id, dono];
+                    sql = mysql.format(sql, sqlInsert);
 
-            this._connection.query(sql, (err, result, fields) => {
-                if (err) return reject(err);
-                resolve({ message: "Prato atualizado com sucesso!" });
-            })
+                    this._connection.query(sql, (err, result, fields) => {
+                        if (err) return reject(err);
+                        resolve({ message: "Prato atualizado com sucesso!" });
+                    })
+                })
+            } else {
+                let sql = "UPDATE prato SET nome=?, descricao=?, modopreparo=?, tempopreparo=?, dificuldade=?, public=?, dataAtualizacao=? where id=? and dono=?";
+                let sqlInsert = [nome, desc, modo, tempo, dif, publica, dataAtualizacao, id, dono];
+                sql = mysql.format(sql, sqlInsert);
+    
+                this._connection.query(sql, (err, result, fields) => {
+                    if (err) return reject(err);
+                    resolve({ message: "Prato atualizado com sucesso!" });
+                })
+            }
+
         });
     }
 
