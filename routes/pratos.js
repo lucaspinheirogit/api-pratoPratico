@@ -2,13 +2,24 @@ const express = require('express');
 const router = express.Router();
 const AuthMiddlewares = require('../auth');
 const helper = require('../helpers')
+const queries = require('../config/queries');
 
 const pratoDAO = require('../dao/pratoDAO');
 const ingredienteDAO = require('../dao/ingredienteDAO');
 
+
 /*  
 !   /pratos
 */
+
+/*  
+*  Buscar pratos
+*/
+router.get("/search", (req, res, next) => {
+    const { nome, tempo, dificuldade } = req.query;
+    
+    queries.search({nome, tempo, dificuldade}).then(pratos => res.json(pratos))
+})
 
 /*  
 *  Criação de um novo prato
