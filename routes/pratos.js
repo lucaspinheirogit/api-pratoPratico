@@ -13,15 +13,6 @@ const ingredienteDAO = require('../dao/ingredienteDAO');
 */
 
 /*  
-*  Buscar pratos
-*/
-router.post("/search", (req, res, next) => {
-    const { nome, tempo, dificuldade, ingredientes } = req.body;
-    
-    queries.search({nome, tempo, dificuldade, ingredientes}).then(pratos => res.json(pratos))
-})
-
-/*  
 *  Criação de um novo prato
 */
 router.post("/", AuthMiddlewares.isLoggedIn, (req, res, next) => {
@@ -168,6 +159,15 @@ router.get("/random", (req, res, next) => {
         .then(prato => res.json(prato))
         .catch(next)
 });
+
+/*  
+*  Buscar pratos
+*/
+router.post("/search", (req, res, next) => {
+    const { nome, tempo, dificuldade, ingredientes } = req.body;
+    
+    queries.search({nome, tempo: parseInt(tempo), dificuldade, ingredientes}).then(pratos => res.json(pratos))
+})
 
 
 

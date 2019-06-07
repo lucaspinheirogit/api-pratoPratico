@@ -21,8 +21,14 @@ module.exports = {
         //Se nome foi informado, buscar pratos com aquele nome 
         if (query.nome) knexQuery.where('nome', 'like', `%${query.nome}%`)
 
-        //Se tempo foi informado, buscar pratos com aquele nome 
-        if (query.tempo) knexQuery.where('tempoPreparo', 'like', `%${query.tempo}%`)
+        //Se tempo foi informado, buscar pratos com aquele tempo e uma margem de 20% para mais e menos
+        //Se a pessoa informou 10 minutos, vai procurar pratos com tempo entre 8 e 12 minutos
+        if (query.tempo) {
+            let margemTempoAntes = query.tempo - (query.tempo / 100 * 20);
+            let margemTempoDepois = query.tempo + (query.tempo / 100 * 20);
+            let tempo = [margemTempoAntes, margemTempoDepois];
+            knexQuery.whereBetween('tempoPreparo', tempo);
+        }
 
         knexQuery.where('public', true) // Sempre buscar pratos públicos
         knexQuery.where('visible', true) // Sempre buscar pratos visiveis
@@ -60,13 +66,14 @@ module.exports = {
 
                     let res = await PratoIngredienteQuery;
                     if (res.length > 0) {
+                        //Se existe um prato com aquele id e aquele ingrediente, coloca o resultado no array de pratos
                         resultado.push(res[0])
                     }
                 }
             }
 
             let resultadoUnico = getUnique(resultado, 'Id'); //remove os elementos duplicados do array de pratos
-            return new Promise(function(resolve, reject) {
+            return new Promise((resolve, reject) => {
                 resolve(resultadoUnico)
             })
         }
