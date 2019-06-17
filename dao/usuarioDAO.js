@@ -30,7 +30,17 @@ class usuariosDAO {
 
             this._connection.query(sql, (err, result, fields) => {
                 if (err) return reject(err);
-                resolve(result[0]);
+                let resposta = result[0];
+
+                let sql = "SELECT * FROM prato WHERE dono=?";
+                let sqlInsert = [id];
+                sql = mysql.format(sql, sqlInsert);
+                this._connection.query(sql, (err, result, fields) => {
+                    
+                    resposta.pratos = result
+                    resolve(resposta);
+                })
+
             })
         });
     }
