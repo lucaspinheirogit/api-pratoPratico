@@ -32,7 +32,7 @@ class usuariosDAO {
                 if (err) return reject(err);
                 let resposta = result[0];
 
-                let sql = "SELECT * FROM prato WHERE dono=?";
+                let sql = "SELECT * FROM prato WHERE dono=? and visible=true";
                 let sqlInsert = [id];
                 sql = mysql.format(sql, sqlInsert);
                 this._connection.query(sql, (err, result, fields) => {
