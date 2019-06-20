@@ -50,7 +50,7 @@ class pratosDAO {
                 let sql = "UPDATE prato SET nome=?, descricao=?, modopreparo=?, tempopreparo=?, dificuldade=?, public=?, dataAtualizacao=? where id=? and dono=?";
                 let sqlInsert = [nome, desc, modo, tempo, dif, publica, dataAtualizacao, id, dono];
                 sql = mysql.format(sql, sqlInsert);
-    
+
                 this._connection.query(sql, (err, result, fields) => {
                     if (err) return reject(err);
                     resolve({ message: "Prato atualizado com sucesso!" });
@@ -211,7 +211,18 @@ class pratosDAO {
 
             this._connection.query(sql, (err, result, fields) => {
                 if (err) return reject(err);
-                resolve(result);
+                let resposta = result[0]
+
+                let sql = "SELECT * FROM prato_ingrediente inner join ingrediente on ingrediente.id = prato_ingrediente.ingrediente_id WHERE prato_id=?";
+                let sqlInsert = [id];
+                sql = mysql.format(sql, sqlInsert);
+
+                this._connection.query(sql, (err, result, fields) => {
+                    if (err) return reject(err);
+                    resposta.ingredientes = result
+                    resolve(resposta);
+                })
+
             })
         });
     }
