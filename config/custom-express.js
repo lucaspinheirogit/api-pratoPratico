@@ -2,10 +2,11 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+const bodyParser = require('body-parser');
 const AuthMiddlewares = require('../auth');
 
 const app = express();
-app.use(cors(), express.json(), morgan('dev'));
+app.use(cors(), bodyParser.json({limit: '50mb'}), morgan('dev'), );
 app.use(AuthMiddlewares.checkToken);
 
 // middleware da conexao com o banco de dados mysql
