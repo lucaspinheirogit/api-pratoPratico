@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
 
 const helper = require('../helpers');
 const loginDAO = require('../dao/loginDAO');
@@ -52,6 +53,44 @@ router.post('/signup', (req, res, next) => {
                 res.status(401).json(result.mensagem)
         })
         .catch(next)
+});
+
+/*
+*  Renovar o token
+*/
+
+router.get('/renew', (req, res, next) => {
+   let token = req.get('authorization');
+
+   if (token !== undefined) {
+       if (token.length > 0) {
+           jwt.verify(token, process.env.SECRET, (error, user) => {
+               if (error) {
+                   res.status(401).end()
+               } else {
+
+                console.log(user)
+
+                   const payload = {
+                       id: user.id,
+                       username: user.username,
+                       role: user.role,
+                   }
+
+                   let newToken = jwt.sign(payload, process.env.SECRET, {
+                       expiresIn: '7d' // expira em 7 dias
+                   });
+
+                   res.status(200);
+                   res.json({ token: newToken });
+               }
+           });
+       } else {
+           res.status(401).end()
+       }
+   } else {
+       res.status(401).end()
+   }
 });
 
 
