@@ -82,7 +82,7 @@ router.delete("/:id/delete", AuthMiddlewares.isLoggedIn, (req, res, next) => {
 /*  
 *  Deletar um ingrediente de um prato
 */
-router.delete("/:id/ingredient/:ingrediente_id/delete/", AuthMiddlewares.isLoggedIn, (req, res, next) => {
+router.delete("/:id/ingredient/:ingrediente_id/delete", AuthMiddlewares.isLoggedIn, (req, res, next) => {
     let dono = req.user.id;
     let { id, ingrediente_id } = req.params;
 
@@ -90,7 +90,27 @@ router.delete("/:id/ingredient/:ingrediente_id/delete/", AuthMiddlewares.isLogge
         .deleteIngredient(id, ingrediente_id, dono)
         .then(result => res.json(result))
         .catch(next)
+});
 
+/*  
+*  Adicionar um ingrediente a um prato
+*/
+router.post("/:id/ingredient", AuthMiddlewares.isLoggedIn, (req, res, next) => {
+    let dono = req.user.id;
+    let { id } = req.params;
+    let { nome, quantidade, unidadeMedida } = req.body;
+
+    let ingredientes = [{ nome, quantidade, unidadeMedida }]
+    let validouIngredientes = helper.validaIngredientes(ingredientes);
+
+    if (!validouIngredientes) {
+        res.status(400).json({ "message": "Dados incorretos" });
+    } else {
+        new ingredienteDAO(req.connection)
+            .create(id, nome, quantidade, unidadeMedida)
+            .then(result => res.json(result))
+            .catch(next)
+    }
 });
 
 /*  
@@ -165,8 +185,8 @@ router.get("/random", (req, res, next) => {
 */
 router.post("/search", (req, res, next) => {
     const { nome, tempo, dificuldade, ingredientes } = req.body;
-    
-    queries.search({nome, tempo: parseInt(tempo), dificuldade, ingredientes}).then(pratos => res.json(pratos))
+
+    queries.search({ nome, tempo: parseInt(tempo), dificuldade, ingredientes }).then(pratos => res.json(pratos))
 })
 
 
