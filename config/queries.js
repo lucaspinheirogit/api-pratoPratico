@@ -18,14 +18,17 @@ module.exports = {
     search: async (query) => {
         let knexQuery = knex('prato')
 
+        //Se a dificuldade for informada, buscar pratos com aquela dificuldade 
+        if (query.dificuldade) knexQuery.where('dificuldade', 'like', `%${query.dificuldade}%`)
+
         //Se nome foi informado, buscar pratos com aquele nome 
         if (query.nome) knexQuery.where('nome', 'like', `%${query.nome}%`)
 
-        //Se tempo foi informado, buscar pratos com aquele tempo e uma margem de 20% para mais e menos
+        //Se tempo foi informado, buscar pratos com aquele tempo e uma margem de 50% para mais e menos
         //Se a pessoa informou 10 minutos, vai procurar pratos com tempo entre 8 e 12 minutos
         if (query.tempo) {
-            let margemTempoAntes = query.tempo - (query.tempo / 100 * 20);
-            let margemTempoDepois = query.tempo + (query.tempo / 100 * 20);
+            let margemTempoAntes = query.tempo - (query.tempo / 100 * 50);
+            let margemTempoDepois = query.tempo + (query.tempo / 100 * 50);
             let tempo = [margemTempoAntes, margemTempoDepois];
             knexQuery.whereBetween('tempoPreparo', tempo);
         }
