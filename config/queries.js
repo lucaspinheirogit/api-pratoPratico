@@ -40,7 +40,7 @@ module.exports = {
             //Para cada ingrediente, checa se o mesmo existe e poe na variavel ingredientes
             for (let j = 0; j < query.ingredientes.length; j++) {
                 let ingredientesQuery = knex('ingrediente')
-                ingredientesQuery.where('nome', query.ingredientes[j].nome)
+                ingredientesQuery.where('nome', query.ingredientes[j])
                 let res = await ingredientesQuery;
                 if (res.length > 0) {
                     ingredientes.push(res[0])
