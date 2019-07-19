@@ -41,7 +41,8 @@ class usuariosDAO {
           sql = mysql.format(sql, sqlInsert);
 
           this.Connection.query(sql, (err, result) => {
-            resposta.favoritos = result;
+            const favoritos = result.map(r => r.prato_id);
+            resposta.favoritos = favoritos;
             resolve(resposta);
           });
 
