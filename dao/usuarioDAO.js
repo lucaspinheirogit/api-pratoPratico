@@ -33,8 +33,18 @@ class usuariosDAO {
         const sqlInsert = [id];
         sql = mysql.format(sql, sqlInsert);
         this.Connection.query(sql, (err, result) => {
+          if (err) return reject(err);
           resposta.pratos = result;
-          resolve(resposta);
+
+          let sql = 'SELECT prato_id FROM favorito INNER JOIN prato ON favorito.prato_id = prato.id WHERE usuario_id = ?';
+          const sqlInsert = [id];
+          sql = mysql.format(sql, sqlInsert);
+
+          this.Connection.query(sql, (err, result) => {
+            resposta.favoritos = result;
+            resolve(resposta);
+          });
+
         });
       });
     });
