@@ -1,195 +1,194 @@
 const express = require('express');
+
 const router = express.Router();
 const AuthMiddlewares = require('../auth');
-const helper = require('../helpers')
+const helper = require('../helpers');
 const queries = require('../config/queries');
 
-const pratoDAO = require('../dao/pratoDAO');
-const ingredienteDAO = require('../dao/ingredienteDAO');
+const PratoDAO = require('../dao/pratoDAO');
+const IngredienteDAO = require('../dao/ingredienteDAO');
 
 
-/*  
+/*
 !   /pratos
 */
 
-/*  
+/*
 *  Criação de um novo prato
 */
-router.post("/", AuthMiddlewares.isLoggedIn, (req, res, next) => {
-  let { nome, descricao, modo, tempo, dificuldade, foto, fotoNome, publica, ingredientes } = req.body;
-  let dono = req.user.id;
+router.post('/', AuthMiddlewares.isLoggedIn, (req, res, next) => {
+  const {
+    nome, descricao, modo, tempo, dificuldade, foto, fotoNome, publica, ingredientes,
+  } = req.body;
+  const dono = req.user.id;
 
-  let validouDificuldade = helper.validaDificuldade(dificuldade);
-  let validouIngredientes = helper.validaIngredientes(ingredientes);
+  const validouDificuldade = helper.validaDificuldade(dificuldade);
+  const validouIngredientes = helper.validaIngredientes(ingredientes);
 
   if (!validouDificuldade || !validouIngredientes) {
-    res.status(400).json({ "message": "Dados incorretos" });
+    res.status(400).json({ message: 'Dados incorretos' });
   } else {
-
-
-    new pratoDAO(req.connection)
+    new PratoDAO(req.connection)
       .create(nome, descricao, modo, tempo, dificuldade, dono, foto, fotoNome, publica)
-      .then(pratoId => {
+      .then((pratoId) => {
+        ingredientes.forEach((ingrediente) => {
+          const { nome, quantidade, unidadeMedida } = ingrediente;
 
-        ingredientes.forEach(ingrediente => {
-          let { nome, quantidade, unidadeMedida } = ingrediente;
-
-          new ingredienteDAO(req.connection)
+          new IngredienteDAO(req.connection)
             .create(pratoId, nome, quantidade, unidadeMedida)
-            .then(result => { })
-            .catch(next)
+            .then(() => { })
+            .catch(next);
         });
-
       })
-      .catch(next)
+      .catch(next);
 
-    res.json({ "message": "Prato cadastrado com sucesso" });
-
-
+    res.json({ message: 'Prato cadastrado com sucesso' });
   }
 });
 
 /*
 *  Atualizar um prato
 */
-router.put("/:id/update", AuthMiddlewares.isLoggedIn, (req, res, next) => {
-  let { nome, descricao, modo, tempo, dificuldade, foto, fotoNome, publica } = req.body;
-  let dono = req.user.id;
+router.put('/:id/update', AuthMiddlewares.isLoggedIn, (req, res, next) => {
+  const {
+    nome, descricao, modo, tempo, dificuldade, foto, fotoNome, publica,
+  } = req.body;
+  const dono = req.user.id;
 
-  let validouDificuldade = helper.validaDificuldade(dificuldade);
+  const validouDificuldade = helper.validaDificuldade(dificuldade);
 
   if (!validouDificuldade) {
-    res.status(400).json({ "message": "Dados incorretos" });
+    res.status(400).json({ message: 'Dados incorretos' });
   } else {
-
-    new pratoDAO(req.connection)
+    new PratoDAO(req.connection)
       .update(req.params.id, nome, descricao, modo, tempo, dificuldade, dono, foto, fotoNome, publica)
       .then(result => res.json(result))
-      .catch(next)
+      .catch(next);
   }
 });
 
-/*  
+/*
 *  Deletar um prato
 */
-router.delete("/:id/delete", AuthMiddlewares.isLoggedIn, (req, res, next) => {
-  new pratoDAO(req.connection)
+router.delete('/:id/delete', AuthMiddlewares.isLoggedIn, (req, res, next) => {
+  new PratoDAO(req.connection)
     .delete(req.params.id, req.user.id)
     .then(response => res.json(response))
-    .catch(next)
+    .catch(next);
 });
 
-/*  
+/*
 *  Deletar um ingrediente de um prato
 */
-router.delete("/:id/ingredient/:ingrediente_id/delete", AuthMiddlewares.isLoggedIn, (req, res, next) => {
-  let dono = req.user.id;
-  let { id, ingrediente_id } = req.params;
+router.delete('/:id/ingredient/:ingrediente_id/delete', AuthMiddlewares.isLoggedIn, (req, res, next) => {
+  const dono = req.user.id;
+  const { id, ingrediente_id } = req.params;
 
-  new pratoDAO(req.connection)
+  new PratoDAO(req.connection)
     .deleteIngredient(id, ingrediente_id, dono)
     .then(result => res.json(result))
-    .catch(next)
+    .catch(next);
 });
 
-/*  
+/*
 *  Adicionar um ingrediente a um prato
 */
-router.post("/:id/ingredient", AuthMiddlewares.isLoggedIn, (req, res, next) => {
-  let dono = req.user.id;
-  let { id } = req.params;
-  let { nome, quantidade, unidadeMedida } = req.body;
+router.post('/:id/ingredient', AuthMiddlewares.isLoggedIn, (req, res, next) => {
+  const { id } = req.params;
+  const { nome, quantidade, unidadeMedida } = req.body;
 
-  let ingredientes = [{ nome, quantidade, unidadeMedida }]
-  let validouIngredientes = helper.validaIngredientes(ingredientes);
+  const ingredientes = [{ nome, quantidade, unidadeMedida }];
+  const validouIngredientes = helper.validaIngredientes(ingredientes);
 
   if (!validouIngredientes) {
-    res.status(400).json({ "message": "Dados incorretos" });
+    res.status(400).json({ message: 'Dados incorretos' });
   } else {
-    new ingredienteDAO(req.connection)
+    new IngredienteDAO(req.connection)
       .create(id, nome, quantidade, unidadeMedida)
       .then(result => res.json(result))
-      .catch(next)
+      .catch(next);
   }
 });
 
-/*  
+/*
 *  Tornar um prato privado, ou publico caso esteja privado
 */
-router.delete("/:id/private", AuthMiddlewares.isLoggedIn, (req, res, next) => {
-  new pratoDAO(req.connection)
+router.delete('/:id/private', AuthMiddlewares.isLoggedIn, (req, res, next) => {
+  new PratoDAO(req.connection)
     .private(req.params.id, req.user.id)
     .then(response => res.json(response))
-    .catch(next)
+    .catch(next);
 });
 
-/*  
+/*
 *  listagem de todos os pratos com paginacao opcional (Offset e limit)
 */
-router.get("/", (req, res, next) => {
-  //Definir valores de paginacao default caso nenhum valor for passado na query da request
-  let offset = Object.is(req.query.offset, undefined) ? 0 : req.query.offset;
-  let limit = Object.is(req.query.limit, undefined) ? 9999 : req.query.limit;
+router.get('/', (req, res, next) => {
+  // Definir valores de paginacao default caso nenhum valor for passado na query da request
+  const offset = Object.is(req.query.offset, undefined) ? 0 : req.query.offset;
+  const limit = Object.is(req.query.limit, undefined) ? 9999 : req.query.limit;
 
-  new pratoDAO(req.connection)
+  new PratoDAO(req.connection)
     .list(offset, limit)
-    .then(pratos => {
-      let hasMore = pratos.total > (parseInt(offset) + parseInt(limit));
+    .then((pratos) => {
+      const hasMore = pratos.total > (parseInt(offset, 10) + parseInt(limit, 10));
       res.json({
-        "pagination": {
+        pagination: {
           offset,
           limit,
-          "total": pratos.total,
-          "hasMore": hasMore,
+          total: pratos.total,
+          hasMore,
         },
-        "pratos": pratos.pratos
-      })
+        pratos: pratos.pratos,
+      });
     })
-    .catch(next)
+    .catch(next);
 });
 
-/*  
+/*
 *  Listar um prato específico
 */
-router.get("/detalhe/:id", (req, res, next) => {
-  let { id } = req.params;
-  new pratoDAO(req.connection)
+router.get('/detalhe/:id', (req, res, next) => {
+  const { id } = req.params;
+  new PratoDAO(req.connection)
     .get(id)
     .then(prato => res.json(prato))
-    .catch(next)
+    .catch(next);
 });
 
-/*  
+/*
 *  Listar os pratos de um usuário específico
 */
-router.get("/usuario/:id", (req, res, next) => {
-  let { id } = req.params;
-  new pratoDAO(req.connection)
+router.get('/usuario/:id', (req, res, next) => {
+  const { id } = req.params;
+  new PratoDAO(req.connection)
     .listFromUser(id)
     .then(prato => res.json(prato))
-    .catch(next)
+    .catch(next);
 });
 
-/*  
+/*
 *  Listar um prato aleatoriamente escolhido
 */
-router.get("/random", (req, res, next) => {
-  new pratoDAO(req.connection)
+router.get('/random', (req, res, next) => {
+  new PratoDAO(req.connection)
     .random()
     .then(prato => res.json(prato))
-    .catch(next)
+    .catch(next);
 });
 
-/*  
+/*
 *  Buscar pratos
 */
-router.post("/search", (req, res, next) => {
-  const { nome, tempo, dificuldade, ingredientes } = req.body;
+router.post('/search', (req, res) => {
+  const {
+    nome, tempo, dificuldade, ingredientes,
+  } = req.body;
 
-  queries.search({ nome, tempo: parseInt(tempo), dificuldade, ingredientes }).then(pratos => res.json(pratos))
-})
-
-
+  queries.search({
+    nome, tempo: parseInt(tempo, 10), dificuldade, ingredientes,
+  }).then(pratos => res.json(pratos));
+});
 
 
 module.exports = router;

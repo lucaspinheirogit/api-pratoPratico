@@ -1,6 +1,6 @@
 require('dotenv').config();
+// const request = require('request');
 const app = require('./config/custom-express');
-const request = require('request');
 
 /*
 setInterval(function () {

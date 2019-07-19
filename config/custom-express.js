@@ -6,19 +6,20 @@ const bodyParser = require('body-parser');
 const AuthMiddlewares = require('../auth');
 
 const app = express();
-app.use(cors(), bodyParser.json({limit: '50mb'}), morgan('dev'), );
+app.use(cors(), bodyParser.json({ limit: '50mb' }), morgan('dev'));
 app.use(AuthMiddlewares.checkToken);
 
 // middleware da conexao com o banco de dados mysql
-pool = require('./pool-factory')
-connectionMiddleware = require('./connection-middleware');
+const pool = require('./pool-factory');
+const connectionMiddleware = require('./connection-middleware');
+
 app.use(connectionMiddleware(pool));
 
 // middleware de log do body da requisicao
 app.use((req, res, next) => {
-    console.log("Body da requisicao: ");
-    console.error(req.body);
-    next();
+  console.log('Body da requisicao: ');
+  console.error(req.body);
+  next();
 });
 
 app.use('/auth', require('../routes/auth.js'));
@@ -29,20 +30,19 @@ app.use('/favoritos', require('../routes/favoritos.js'));
 app.use('/ingredientes', require('../routes/ingredientes.js'));
 
 
-
 app.use('/images', require('../routes/images.js'));
 
 function notFound(req, res, next) {
-    res.status(404);
-    next(new Error('Not Found - ' + req.originalUrl));
+  res.status(404);
+  next(new Error(`Not Found - ${req.originalUrl}`));
 }
 
-function errorHandler(err, req, res, next) {
-    console.log(err.stack)
-    res.status(res.statusCode || 500);
-    res.json({
-        message: err.message,
-    });
+function errorHandler(err, req, res) {
+  console.log(err.stack);
+  res.status(res.statusCode || 500);
+  res.json({
+    message: err.message,
+  });
 }
 
 app.use(notFound);

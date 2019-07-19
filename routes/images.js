@@ -1,4 +1,5 @@
 const express = require('express');
+
 const router = express.Router();
 const helper = require('../helpers');
 
@@ -11,11 +12,11 @@ const helper = require('../helpers');
 //     }
 // });
 
-/*  
+/*
 !   /images
 */
 
-/*  
+/*
 *  Upload da imagem para o firebase
 */
 
@@ -23,17 +24,16 @@ const helper = require('../helpers');
  * Adding new file to the storage
  */
 router.post('/upload', helper.multer.single('file'), (req, res) => {
-    let file = req.file;
+  const { file } = req;
 
-    if (file) {
-        helper.uploadImageGetUrl(file).then((url) => {
-            res.status(200).send({ url });
-        }).catch((error) => {
-            console.error(error);
-        });
-    }
+  if (file) {
+    helper.uploadImageGetUrl(file).then((url) => {
+      res.status(200).send({ url });
+    }).catch((error) => {
+      console.error(error);
+    });
+  }
 });
-
 
 
 module.exports = router;
