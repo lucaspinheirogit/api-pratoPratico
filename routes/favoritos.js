@@ -12,7 +12,7 @@ const PratoDAO = require('../dao/pratoDAO');
 /*
 *  listagem dos pratos favoritos de um usuário
 */
-router.get('/', (req, res, next) => {
+router.get('/', AuthMiddlewares.isLoggedIn, (req, res, next) => {
   new PratoDAO(req.connection)
     .listFavoritesFromUser(req.user.id)
     .then(result => res.json(result))
