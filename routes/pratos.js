@@ -185,8 +185,11 @@ router.post('/search', (req, res) => {
     nome, tempo, dificuldade, ingredientes,
   } = req.body;
 
+  const offset = Object.is(req.body.offset, undefined) ? 0 : parseInt(req.body.offset, 10);
+  const limit = Object.is(req.body.limit, undefined) ? 5 : parseInt(req.body.limit, 10);
+
   queries.search({
-    nome, tempo: parseInt(tempo, 10), dificuldade, ingredientes,
+    nome, tempo: parseInt(tempo, 10), dificuldade, ingredientes, offset, limit,
   }).then(pratos => res.json(pratos));
 });
 

@@ -34,6 +34,8 @@ module.exports = {
 
     knexQuery.where('public', true); // Sempre buscar pratos públicos
     knexQuery.where('visible', true); // Sempre buscar pratos visiveis
+    knexQuery.limit(query.limit);
+    knexQuery.offset(query.offset);
 
     // Se Ingredientes foram informados, buscar pratos com aqueles ingredientes
     if (query.ingredientes) {

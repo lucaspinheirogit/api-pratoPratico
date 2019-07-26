@@ -136,15 +136,39 @@ class pratosDAO {
     });
   }
 
-  listFavoritesFromUser(id) {
+  // listFavoritesFromUser(id) {
+  //   return new Promise((resolve, reject) => {
+  //     let sql = 'SELECT * FROM favorito INNER JOIN prato ON favorito.prato_id = prato.id WHERE usuario_id = ?';
+  //     const sqlInsert = [id];
+  //     sql = mysql.format(sql, sqlInsert);
+
+  //     this.Connection.query(sql, (err, result) => {
+  //       if (err) return reject(err);
+  //       resolve(result);
+  //     });
+  //   });
+  // }
+
+  listFavoritesFromUser(id, offset, limit) {
     return new Promise((resolve, reject) => {
-      let sql = 'SELECT * FROM favorito INNER JOIN prato ON favorito.prato_id = prato.id WHERE usuario_id = ?';
-      const sqlInsert = [id];
-      sql = mysql.format(sql, sqlInsert);
+      const resultado = {
+        pratos: '',
+        total: 0,
+      };
+
+      const sql = `SELECT * FROM favorito INNER JOIN prato ON favorito.prato_id = prato.id WHERE usuario_id = ${id} ORDER BY prato_id desc LIMIT ${offset}, ${limit}`;
 
       this.Connection.query(sql, (err, result) => {
         if (err) return reject(err);
-        resolve(result);
+        resultado.pratos = result;
+
+        const sql2 = `SELECT COUNT(*) FROM favorito INNER JOIN prato ON favorito.prato_id = prato.id WHERE usuario_id = ${id}`;
+
+        this.Connection.query(sql2, (err, result) => {
+          if (err) return reject(err);
+          resultado.total = result[0]['COUNT(*)'];
+          resolve(resultado);
+        });
       });
     });
   }

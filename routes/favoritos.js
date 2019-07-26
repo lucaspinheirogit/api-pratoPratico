@@ -11,11 +11,36 @@ const PratoDAO = require('../dao/pratoDAO');
 
 /*
 *  listagem dos pratos favoritos de um usuário
-*/
 router.get('/', AuthMiddlewares.isLoggedIn, (req, res, next) => {
   new PratoDAO(req.connection)
     .listFavoritesFromUser(req.user.id)
     .then(result => res.json(result))
+    .catch(next);
+});
+*/
+
+/*
+*  listagem dos pratos favoritos de um usuário com paginacao opcional (Offset e limit)
+*/
+router.get('/', AuthMiddlewares.isLoggedIn, (req, res, next) => {
+  // Definir valores de paginacao default caso nenhum valor for passado na query da request
+  const offset = Object.is(req.query.offset, undefined) ? 0 : req.query.offset;
+  const limit = Object.is(req.query.limit, undefined) ? 9999 : req.query.limit;
+
+  new PratoDAO(req.connection)
+    .listFavoritesFromUser(req.user.id, offset, limit)
+    .then((pratos) => {
+      const hasMore = pratos.total > (parseInt(offset, 10) + parseInt(limit, 10));
+      res.json({
+        pagination: {
+          offset,
+          limit,
+          total: pratos.total,
+          hasMore,
+        },
+        pratos: pratos.pratos,
+      });
+    })
     .catch(next);
 });
 
