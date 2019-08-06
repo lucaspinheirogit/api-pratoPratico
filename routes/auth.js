@@ -10,7 +10,7 @@ const LoginDAO = require('../dao/loginDAO');
 */
 
 /*
-*  Logar checando se o email/senha estão corretos
+*  Logar checando se o email e a senha estão corretos
 */
 
 router.post('/login', (req, res, next) => {
