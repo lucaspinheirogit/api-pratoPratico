@@ -5,7 +5,7 @@ module.exports = {
     const token = req.get('authorization');
     if (token !== undefined) {
       if (token.length > 0) {
-        jwt.verify(token, process.env.SECRET, (error, user) => {
+        jwt.verify(token, process.env.JWT_SECRET, (error, user) => {
           if (error) throw error;
           req.user = user;
           next();

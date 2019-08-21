@@ -25,7 +25,7 @@ class loginDAO {
               role: result[0].Role,
             };
 
-            const token = jwt.sign(payload, process.env.SECRET, {
+            const token = jwt.sign(payload, process.env.JWT_SECRET, {
               expiresIn: '7d', // expira em 7 dias
             });
 

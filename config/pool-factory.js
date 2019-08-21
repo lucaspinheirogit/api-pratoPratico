@@ -1,15 +1,12 @@
-require('dotenv').config();
 const mysql = require('mysql');
 
 const pool = mysql.createPool({
   connectionLimit: 10,
-  host: process.env.HOST,
-  user: process.env.USER,
-  password: process.env.PASSWORD,
-  database: process.env.DATABASE,
+  host: process.env.DATABASE_HOST || 'localhost',
+  database: process.env.DATABASE_NAME || 'pratopratico',
+  user: process.env.DATABASE_USERNAME || 'root',
+  password: process.env.DATABASE_PASSWORD || '',
 });
-
-pool.on('release', () => console.log('pool => conexão retornada'));
 
 /* eslint-disable consistent-return */
 process.on('SIGINT', () => pool.end((err) => {
