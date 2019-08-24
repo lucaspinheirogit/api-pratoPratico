@@ -11,15 +11,31 @@ class pratosDAO {
     return new Promise((resolve, reject) => {
       const dataCriacao = moment().format('YYYY-MM-DD HH:mm:ss');
 
-      const img = helper.base64ImageToBlob(foto);
-      helper.uploadImageGetUrl(img, fotoNome, dono).then((url) => {
-        let sql = 'INSERT INTO prato (Nome, Descricao, ModoPreparo, TempoPreparo, Dificuldade, Dono, Foto, Public, DataCriacao, Visible) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-        const sqlInsert = [nome, desc, modo, tempo, dif, dono, url, publica, dataCriacao, true];
-        sql = mysql.format(sql, sqlInsert);
+      helper.base64ImageToBlob(foto).then((img) => {
+        helper.uploadImageGetUrl(img, fotoNome, dono).then((url) => {
+          console.log(url);
+          let sql = 'INSERT INTO prato (Nome, Descricao, ModoPreparo, TempoPreparo, Dificuldade, Dono, Foto, Public, DataCriacao, dataAtualizacao, Visible) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+          const sqlInsert = [
+            nome,
+            desc,
+            modo,
+            tempo,
+            dif,
+            dono,
+            url,
+            publica,
+            dataCriacao,
+            dataCriacao,
+            true,
+          ];
+          sql = mysql.format(sql, sqlInsert);
 
-        this.Connection.query(sql, (err, result) => {
-          if (err) return reject(err);
-          resolve(result.insertId);
+          console.log(sql);
+
+          this.Connection.query(sql, (err, result) => {
+            if (err) return reject(err);
+            resolve(result.insertId);
+          });
         });
       });
     });
@@ -30,20 +46,42 @@ class pratosDAO {
       const dataAtualizacao = moment().format('YYYY-MM-DD HH:mm:ss');
 
       if (foto) {
-        const img = helper.base64ImageToBlob(foto);
-        helper.uploadImageGetUrl(img, fotoNome, dono).then((url) => {
-          let sql = 'UPDATE prato SET nome=?, descricao=?, modopreparo=?, tempopreparo=?, dificuldade=?, foto=?, public=?, dataAtualizacao=? where id=? and dono=?';
-          const sqlInsert = [nome, desc, modo, tempo, dif, url, publica, dataAtualizacao, id, dono];
-          sql = mysql.format(sql, sqlInsert);
+        helper.base64ImageToBlob(foto).then((img) => {
+          helper.uploadImageGetUrl(img, fotoNome, dono).then((url) => {
+            let sql = 'UPDATE prato SET nome=?, descricao=?, modopreparo=?, tempopreparo=?, dificuldade=?, foto=?, public=?, dataAtualizacao=? where id=? and dono=?';
+            const sqlInsert = [
+              nome,
+              desc,
+              modo,
+              tempo,
+              dif,
+              url,
+              publica,
+              dataAtualizacao,
+              id,
+              dono,
+            ];
+            sql = mysql.format(sql, sqlInsert);
 
-          this.Connection.query(sql, (err) => {
-            if (err) return reject(err);
-            resolve({ message: 'Prato atualizado com sucesso!' });
+            this.Connection.query(sql, (err) => {
+              if (err) return reject(err);
+              resolve({ message: 'Prato atualizado com sucesso!' });
+            });
           });
         });
       } else {
         let sql = 'UPDATE prato SET nome=?, descricao=?, modopreparo=?, tempopreparo=?, dificuldade=?, public=?, dataAtualizacao=? where id=? and dono=?';
-        const sqlInsert = [nome, desc, modo, tempo, dif, publica, dataAtualizacao, id, dono];
+        const sqlInsert = [
+          nome,
+          desc,
+          modo,
+          tempo,
+          dif,
+          publica,
+          dataAtualizacao,
+          id,
+          dono,
+        ];
         sql = mysql.format(sql, sqlInsert);
 
         this.Connection.query(sql, (err) => {
@@ -125,7 +163,7 @@ class pratosDAO {
 
   listFromUser(id) {
     return new Promise((resolve, reject) => {
-      let sql = 'SELECT * FROM prato WHERE dono = ? and public = \'1\'';
+      let sql = "SELECT * FROM prato WHERE dono = ? and public = '1'";
       const sqlInsert = [id];
       sql = mysql.format(sql, sqlInsert);
 
@@ -188,28 +226,27 @@ class pratosDAO {
 
   favorite(pratoId, usuarioId) {
     return new Promise((resolve, reject) => {
-      this.FavoritoJaExiste(pratoId, usuarioId)
-        .then((resultado) => {
-          if (resultado) {
-            let sql = 'DELETE FROM favorito WHERE prato_id=? AND usuario_id=?';
-            const sqlInsert = [pratoId, usuarioId];
-            sql = mysql.format(sql, sqlInsert);
+      this.FavoritoJaExiste(pratoId, usuarioId).then((resultado) => {
+        if (resultado) {
+          let sql = 'DELETE FROM favorito WHERE prato_id=? AND usuario_id=?';
+          const sqlInsert = [pratoId, usuarioId];
+          sql = mysql.format(sql, sqlInsert);
 
-            this.Connection.query(sql, (err) => {
-              if (err) return reject(err);
-              resolve('desfavoritado com sucesso!');
-            });
-          } else {
-            let sql = 'INSERT INTO favorito (Prato_id, Usuario_id) VALUES (?,?)';
-            const sqlInsert = [pratoId, usuarioId];
-            sql = mysql.format(sql, sqlInsert);
+          this.Connection.query(sql, (err) => {
+            if (err) return reject(err);
+            resolve('desfavoritado com sucesso!');
+          });
+        } else {
+          let sql = 'INSERT INTO favorito (Prato_id, Usuario_id) VALUES (?,?)';
+          const sqlInsert = [pratoId, usuarioId];
+          sql = mysql.format(sql, sqlInsert);
 
-            this.Connection.query(sql, (err, result) => {
-              if (err) return reject(err);
-              resolve(result.insertId);
-            });
-          }
-        });
+          this.Connection.query(sql, (err, result) => {
+            if (err) return reject(err);
+            resolve(result.insertId);
+          });
+        }
+      });
     });
   }
 

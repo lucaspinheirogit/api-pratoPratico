@@ -45,7 +45,6 @@ class usuariosDAO {
             resposta.favoritos = favoritos;
             resolve(resposta);
           });
-
         });
       });
     });
@@ -57,15 +56,18 @@ class usuariosDAO {
       const hash = bcrypt.hashSync(senha, 3);
 
       if (img) {
-        img = helper.base64ImageToBlob(img);
-        helper.uploadImageGetUrl(img, imgNome, nome).then((url) => {
-          let sql = 'UPDATE usuario SET nome=?, senha=?, img=?, dataAtualizacao=? where id=?';
-          const sqlInsert = [nome, hash, url, dataAtualizacao, id];
-          sql = mysql.format(sql, sqlInsert);
+        helper.base64ImageToBlob(img).then((img) => {
+          helper.uploadImageGetUrl(img, imgNome, nome).then((url) => {
+            let sql = 'UPDATE usuario SET nome=?, senha=?, img=?, dataAtualizacao=? where id=?';
+            const sqlInsert = [nome, hash, url, dataAtualizacao, id];
+            sql = mysql.format(sql, sqlInsert);
 
-          this.Connection.query(sql, (err, result) => {
-            if (err) return reject(err);
-            result.changedRows > 0 ? resolve({ message: 'Dados alterados com sucesso!' }) : resolve({ message: 'Erro, tente novamente mais tarde!' });
+            this.Connection.query(sql, (err, result) => {
+              if (err) return reject(err);
+              result.changedRows > 0
+                ? resolve({ message: 'Dados alterados com sucesso!' })
+                : resolve({ message: 'Erro, tente novamente mais tarde!' });
+            });
           });
         });
       } else {
@@ -75,7 +77,9 @@ class usuariosDAO {
 
         this.Connection.query(sql, (err, result) => {
           if (err) return reject(err);
-          result.changedRows > 0 ? resolve({ message: 'Dados alterados com sucesso!' }) : resolve({ message: 'Erro, tente novamente mais tarde!' });
+          result.changedRows > 0
+            ? resolve({ message: 'Dados alterados com sucesso!' })
+            : resolve({ message: 'Erro, tente novamente mais tarde!' });
         });
       }
     });

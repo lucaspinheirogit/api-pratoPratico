@@ -52,7 +52,7 @@ class loginDAO {
     });
   }
 
-  signup(nome, img, imgNome, email, senha) {
+  signup(nome, foto, imgNome, email, senha) {
     return new Promise((resolve, reject) => {
       let sql = 'SELECT * FROM usuario WHERE email=?';
       const sqlInsert = [email];
@@ -66,21 +66,22 @@ class loginDAO {
             mensagem: 'Esse email já foi cadastrado!',
           });
         } else {
-          img = helper.base64ImageToBlob(img);
-          helper.uploadImageGetUrl(img, imgNome, nome).then((url) => {
-            const hash = bcrypt.hashSync(senha, 3);
-            const dataCriacao = moment().format('YYYY-MM-DD HH:mm:ss');
+          helper.base64ImageToBlob(foto).then((img) => {
+            helper.uploadImageGetUrl(img, imgNome, nome).then((url) => {
+              const hash = bcrypt.hashSync(senha, 3);
+              const dataAtual = moment().format('YYYY-MM-DD HH:mm:ss');
 
-            let sql = 'INSERT INTO usuario (nome, img, email, senha, dataCriacao) VALUES (?, ?, ?, ?, ?)';
-            const sqlInsert = [nome, url, email, hash, dataCriacao];
-            sql = mysql.format(sql, sqlInsert);
+              let sql = 'INSERT INTO usuario (nome, img, email, senha, dataCriacao, dataAtualizacao) VALUES (?, ?, ?, ?, ?, ?)';
+              const sqlInsert = [nome, url, email, hash, dataAtual, dataAtual];
+              sql = mysql.format(sql, sqlInsert);
 
-            this.Connection.query(sql, (err) => {
-              if (err) return reject(err);
-              resolve({
-                auth: true,
-                email,
-                senha,
+              this.Connection.query(sql, (err) => {
+                if (err) return reject(err);
+                resolve({
+                  auth: true,
+                  email,
+                  senha,
+                });
               });
             });
           });

@@ -3,6 +3,7 @@ const { Storage } = require('@google-cloud/storage');
 const Multer = require('multer');
 const atob = require('atob');
 const Blob = require('node-blob');
+const sharp = require('sharp');
 
 const storage = new Storage({
   projectId: 'pratopratico-ebbc3',
@@ -25,7 +26,9 @@ module.exports = {
     let validou = true;
     ingredientes.forEach((ingrediente) => {
       // Checa se a unidade de medida está correta , pois são aceitos valores pré-definidos (enum)
-      if (Object.values(unidadeEnum).indexOf(ingrediente.unidadeMedida) === -1) {
+      if (
+        Object.values(unidadeEnum).indexOf(ingrediente.unidadeMedida) === -1
+      ) {
         validou = false;
       }
     });
@@ -50,7 +53,9 @@ module.exports = {
     });
 
     blobStream.on('finish', async () => {
-      let url = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${fileUpload.name}`;
+      let url = `https://firebasestorage.googleapis.com/v0/b/${
+        bucket.name
+      }/o/${fileUpload.name}`;
 
       const result = await fetch(url);
       const data = await result.json();
@@ -69,29 +74,48 @@ module.exports = {
       console.log('Error: ', error);
     };
   },
-  base64ImageToBlob: (str) => {
-    // extract content type and base64 payload from original string
-    const pos = str.indexOf(';base64,');
-    const type = str.substring(5, pos);
-    const b64 = str.substr(pos + 8);
+  base64ImageToBlob: str => new Promise((resolve, reject) => {
+    const parts = str.split(';');
+    const mimType = parts[0].split(':')[1];
+    const imageData = parts[1].split(',')[1];
 
-    // decode base64
-    const imageContent = atob(b64);
+    const img = Buffer.from(imageData, 'base64');
+    sharp(img)
+      .resize(480, 360, {
+        fit: 'contain',
+      })
+      .toBuffer()
+      .then((resizedImageBuffer) => {
+        const resizedImageData = resizedImageBuffer.toString('base64');
+        const resizedBase64 = `data:${mimType};base64,${resizedImageData}`;
 
-    // create an ArrayBuffer and a view (as unsigned 8-bit)
-    const buffer = new ArrayBuffer(imageContent.length);
-    const view = new Uint8Array(buffer);
+        // extract content type and base64 payload from original string
+        const pos = resizedBase64.indexOf(';base64,');
+        const type = resizedBase64.substring(5, pos);
+        const b64 = resizedBase64.substr(pos + 8);
 
-    // fill the view, using the decoded base64
-    for (let n = 0; n < imageContent.length; n += 1) {
-      view[n] = imageContent.charCodeAt(n);
-    }
+        // decode base64
+        const imageContent = atob(b64);
 
-    // convert ArrayBuffer to Blob
-    const blobImage = new Blob([buffer], { type });
+        // create an ArrayBuffer and a view (as unsigned 8-bit)
+        const buffer = new ArrayBuffer(imageContent.length);
+        const view = new Uint8Array(buffer);
 
-    return blobImage;
-  },
+        // fill the view, using the decoded base64
+        for (let n = 0; n < imageContent.length; n += 1) {
+          view[n] = imageContent.charCodeAt(n);
+        }
+
+        // convert ArrayBuffer to Blob
+        const blobImage = new Blob([buffer], { type });
+
+        resolve(blobImage);
+      })
+      .catch((error) => {
+        // error handeling
+        console.log(error);
+      });
+  }),
   multer: Multer({
     storage: Multer.memoryStorage(),
     limits: {

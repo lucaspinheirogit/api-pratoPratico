@@ -15,11 +15,11 @@ const connectionMiddleware = require('./connection-middleware');
 app.use(connectionMiddleware(pool));
 
 // middleware de log do body da requisicao
-app.use((req, res, next) => {
-  console.log('Body da requisicao: ');
-  console.error(req.body);
-  next();
-});
+// app.use((req, res, next) => {
+//   console.log('Body da requisicao: ');
+//   console.error(req.body);
+//   next();
+// });
 
 app.use('/auth', require('../routes/auth.js'));
 app.use('/usuarios', AuthMiddlewares.isLoggedIn, require('../routes/usuarios.js'));
