@@ -142,7 +142,7 @@ class pratosDAO {
         total: 0,
       };
 
-      const sql = `SELECT * FROM prato WHERE public = '1' ORDER BY id desc LIMIT ${offset}, ${limit}`;
+      const sql = `SELECT * FROM prato WHERE visible = '1' ORDER BY id desc LIMIT ${offset}, ${limit}`;
       // let sqlInsert = [offset, limit];
       // sql = mysql.format(sql, sqlInsert);
 
@@ -150,7 +150,7 @@ class pratosDAO {
         if (err) return reject(err);
         resultado.pratos = result;
 
-        const sql2 = "SELECT COUNT(*) FROM prato where public = '1'";
+        const sql2 = "SELECT COUNT(*) FROM prato where visible = '1'";
 
         this.Connection.query(sql2, (err, result) => {
           if (err) return reject(err);
@@ -163,7 +163,7 @@ class pratosDAO {
 
   listFromUser(id) {
     return new Promise((resolve, reject) => {
-      let sql = "SELECT * FROM prato WHERE dono = ? and public = '1'";
+      let sql = "SELECT * FROM prato WHERE dono = ? and visible = '1'";
       const sqlInsert = [id];
       sql = mysql.format(sql, sqlInsert);
 
@@ -173,19 +173,6 @@ class pratosDAO {
       });
     });
   }
-
-  // listFavoritesFromUser(id) {
-  //   return new Promise((resolve, reject) => {
-  //     let sql = 'SELECT * FROM favorito INNER JOIN prato ON favorito.prato_id = prato.id WHERE usuario_id = ?';
-  //     const sqlInsert = [id];
-  //     sql = mysql.format(sql, sqlInsert);
-
-  //     this.Connection.query(sql, (err, result) => {
-  //       if (err) return reject(err);
-  //       resolve(result);
-  //     });
-  //   });
-  // }
 
   listFavoritesFromUser(id, offset, limit) {
     return new Promise((resolve, reject) => {
@@ -275,7 +262,7 @@ class pratosDAO {
 
   random() {
     return new Promise((resolve, reject) => {
-      const sql = "SELECT * FROM prato WHERE public = '1' ORDER BY RAND() LIMIT 1";
+      const sql = "SELECT * FROM prato WHERE visible = '1' ORDER BY RAND() LIMIT 1";
 
       this.Connection.query(sql, (err, result) => {
         if (err) return reject(err);
