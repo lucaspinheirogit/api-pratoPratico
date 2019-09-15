@@ -6,6 +6,7 @@ const AuthMiddlewares = require('../auth');
 
 const app = express();
 app.use(cors(), bodyParser.json({ limit: '50mb' }), morgan('dev'));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(AuthMiddlewares.checkToken);
 
 // middleware da conexao com o banco de dados mysql

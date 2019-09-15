@@ -2,9 +2,9 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const mysql = require('mysql');
 const moment = require('moment');
-const helper = require('../helpers');
+const imgHelper = require('../helpers/imageUpload');
 
-class loginDAO {
+class AuthDAO {
   constructor(connection) {
     this.Connection = connection;
   }
@@ -52,13 +52,13 @@ class loginDAO {
     });
   }
 
-  signup(nome, foto, imgNome, email, senha) {
+  signup(nome, email, senha, image) {
     return new Promise((resolve, reject) => {
       let sql = 'SELECT * FROM usuario WHERE email=?';
       const sqlInsert = [email];
       sql = mysql.format(sql, sqlInsert);
 
-      this.Connection.query(sql, (err, result) => {
+      this.Connection.query(sql, async (err, result) => {
         if (err) return reject(err);
         if (result.length > 0) {
           resolve({
@@ -66,23 +66,20 @@ class loginDAO {
             mensagem: 'Esse email já foi cadastrado!',
           });
         } else {
-          helper.base64ImageToBlob(foto).then((img) => {
-            helper.uploadImageGetUrl(img, imgNome, nome).then((url) => {
-              const hash = bcrypt.hashSync(senha, 3);
-              const dataAtual = moment().format('YYYY-MM-DD HH:mm:ss');
+          const hash = bcrypt.hashSync(senha, 3);
+          const dataAtual = moment().format('YYYY-MM-DD HH:mm:ss');
+          const url = await imgHelper.uploadImageGetURL(image);
 
-              let sql = 'INSERT INTO usuario (nome, img, email, senha, dataCriacao, dataAtualizacao) VALUES (?, ?, ?, ?, ?, ?)';
-              const sqlInsert = [nome, url, email, hash, dataAtual, dataAtual];
-              sql = mysql.format(sql, sqlInsert);
+          let sql = 'INSERT INTO usuario (nome, img, email, senha, dataCriacao, dataAtualizacao) VALUES (?, ?, ?, ?, ?, ?)';
+          const sqlInsert = [nome, url, email, hash, dataAtual, dataAtual];
+          sql = mysql.format(sql, sqlInsert);
 
-              this.Connection.query(sql, (err) => {
-                if (err) return reject(err);
-                resolve({
-                  auth: true,
-                  email,
-                  senha,
-                });
-              });
+          this.Connection.query(sql, (err) => {
+            if (err) return reject(err);
+            resolve({
+              auth: true,
+              email,
+              senha,
             });
           });
         }
@@ -137,4 +134,4 @@ class loginDAO {
   // }
 }
 
-module.exports = loginDAO;
+module.exports = AuthDAO;

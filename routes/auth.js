@@ -3,20 +3,26 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 
-const LoginDAO = require('../dao/loginDAO');
+const multer = require('multer');
+const multerConfig = require('../config/multer');
+
+const AuthDAO = require('../dao/authDAO');
 
 /*
 !   /auth
 */
 
 /*
-*  Logar checando se o email e a senha estão corretos
-*/
+ *  Logar checando se o email e a senha estão corretos
+ */
 
 router.post('/login', (req, res, next) => {
   const { email, senha } = req.body;
 
-  new LoginDAO(req.connection)
+  console.log(email);
+  console.log(senha);
+
+  new AuthDAO(req.connection)
     .login(email, senha)
     .then((result) => {
       result.auth
@@ -31,35 +37,39 @@ router.post('/login', (req, res, next) => {
 });
 
 /*
-*  Cadastrar checando se o email não está cadastrado já
-*/
-router.post('/signup', (req, res, next) => {
-  const {
-    nome, img, imgNome, email, senha,
-  } = req.body;
+ *  Cadastrar checando se o email não está cadastrado já
+ */
+router.post(
+  '/signup',
+  multer(multerConfig).single('file'),
+  async (req, res, next) => {
+    const { nome, email, senha } = req.body;
 
-  new LoginDAO(req.connection)
-    .signup(nome, img, imgNome, email, senha)
-    .then((result) => {
-      result.auth
-        ? new LoginDAO(req.connection)
-          .login(email, senha)
-          .then((result) => {
-            result.auth ? res.status(200).json({
-              token: result.token,
-              username: result.username,
-              role: result.role,
-            }) : res.status(401).json(result.mensagem);
-          })
-          .catch(next)
-        : res.status(401).json(result.mensagem);
-    })
-    .catch(next);
-});
+    new AuthDAO(req.connection)
+      .signup(nome, email, senha, req.file)
+      .then((result) => {
+        result.auth
+          ? new AuthDAO(req.connection)
+            .login(email, senha)
+            .then((result) => {
+              result.auth
+                ? res.status(200).json({
+                  token: result.token,
+                  username: result.username,
+                  role: result.role,
+                })
+                : res.status(401).json(result.mensagem);
+            })
+            .catch(next)
+          : res.status(401).json(result.mensagem);
+      })
+      .catch(next);
+  },
+);
 
 /*
-*  Renovar o token
-*/
+ *  Renovar o token
+ */
 
 router.get('/renew', (req, res) => {
   const token = req.get('authorization');
@@ -93,6 +103,5 @@ router.get('/renew', (req, res) => {
     res.status(401).end();
   }
 });
-
 
 module.exports = router;
