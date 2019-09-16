@@ -1,13 +1,11 @@
-const express = require('express');
+const express = require("express")
+const jwt = require("jsonwebtoken")
+const multer = require("multer")
 
-const router = express.Router();
-const jwt = require('jsonwebtoken');
+const multerConfig = require("../config/multer")
+const AuthDAO = require("../dao/authDAO")
 
-const multer = require('multer');
-const multerConfig = require('../config/multer');
-
-const AuthDAO = require('../dao/authDAO');
-
+const router = express.Router()
 /*
 !   /auth
 */
@@ -16,92 +14,89 @@ const AuthDAO = require('../dao/authDAO');
  *  Logar checando se o email e a senha estão corretos
  */
 
-router.post('/login', (req, res, next) => {
-  const { email, senha } = req.body;
-
-  console.log(email);
-  console.log(senha);
+router.post("/login", (req, res, next) => {
+  const { email, senha } = req.body
 
   new AuthDAO(req.connection)
     .login(email, senha)
-    .then((result) => {
+    .then(result => {
       result.auth
         ? res.status(200).json({
-          token: result.token,
-          username: result.username,
-          role: result.role,
-        })
-        : res.status(401).json(result.mensagem);
+            token: result.token,
+            username: result.username,
+            role: result.role
+          })
+        : res.status(401).json(result.mensagem)
     })
-    .catch(next);
-});
+    .catch(next)
+})
 
 /*
  *  Cadastrar checando se o email não está cadastrado já
  */
 router.post(
-  '/signup',
-  multer(multerConfig).single('file'),
+  "/signup",
+  multer(multerConfig).single("file"),
   async (req, res, next) => {
-    const { nome, email, senha } = req.body;
+    const { nome, email, senha } = req.body
 
     new AuthDAO(req.connection)
       .signup(nome, email, senha, req.file)
-      .then((result) => {
+      .then(result => {
         result.auth
           ? new AuthDAO(req.connection)
-            .login(email, senha)
-            .then((result) => {
-              result.auth
-                ? res.status(200).json({
-                  token: result.token,
-                  username: result.username,
-                  role: result.role,
-                })
-                : res.status(401).json(result.mensagem);
-            })
-            .catch(next)
-          : res.status(401).json(result.mensagem);
+              .login(email, senha)
+              .then(result => {
+                result.auth
+                  ? res.status(200).json({
+                      token: result.token,
+                      username: result.username,
+                      role: result.role
+                    })
+                  : res.status(401).json(result.mensagem)
+              })
+              .catch(next)
+          : res.status(401).json(result.mensagem)
       })
-      .catch(next);
-  },
-);
+      .catch(next)
+  }
+)
 
 /*
  *  Renovar o token
  */
 
-router.get('/renew', (req, res) => {
-  const token = req.get('authorization');
+router.get("/renew", (req, res) => {
+  const token = req.get("authorization")
 
   if (token !== undefined) {
     if (token.length > 0) {
       jwt.verify(token, process.env.JWT_SECRET, (error, user) => {
         if (error) {
-          res.status(401).end();
+          res.status(401).end()
         } else {
-          console.log(user);
+          console.log(user)
 
           const payload = {
             id: user.id,
             username: user.username,
-            role: user.role,
-          };
+            role: user.role
+          }
 
           const newToken = jwt.sign(payload, process.env.JWT_SECRET, {
-            expiresIn: '7d', // expira em 7 dias
-          });
+            expiresIn: "7d" // expira em 7 dias
+          })
 
-          res.status(200);
-          res.json({ token: newToken });
+          res.status(200)
+          res.json({ token: newToken })
         }
-      });
+      })
     } else {
-      res.status(401).end();
+      res.status(401).end()
     }
   } else {
-    res.status(401).end();
+    res.status(401).end()
   }
-});
+})
 
-module.exports = router;
+module.exports = router

@@ -1,9 +1,9 @@
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config();
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config()
 }
 
 // const request = require('request');
-const app = require('./config/custom-express');
+const app = require("./config/custom-express")
 
 /*
 setInterval(function () {
@@ -15,4 +15,4 @@ setInterval(function () {
 }, 1500000); //sends a GET request every 25 minutes (1500000) to maintain the app awake
 */
 
-app.listen(process.env.PORT || 5000);
+app.listen(process.env.PORT || 5000)
