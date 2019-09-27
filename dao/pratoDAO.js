@@ -1,75 +1,69 @@
 const mysql = require("mysql")
 const moment = require("moment")
-const helper = require("../helpers")
+const imgHelper = require("../helpers/imageUpload")
 
 class pratosDAO {
   constructor(connection) {
     this.Connection = connection
   }
 
-  create(nome, desc, modo, tempo, dif, dono, foto, fotoNome, publica) {
-    return new Promise((resolve, reject) => {
+  create(nome, desc, modo, tempo, dif, dono, foto, publica) {
+    return new Promise(async (resolve, reject) => {
       const dataCriacao = moment().format("YYYY-MM-DD HH:mm:ss")
 
-      helper.base64ImageToBlob(foto).then(img => {
-        helper.uploadImageGetUrl(img, fotoNome, dono).then(url => {
-          console.log(url)
-          let sql =
-            "INSERT INTO prato (Nome, Descricao, ModoPreparo, TempoPreparo, Dificuldade, Dono, Foto, Public, DataCriacao, dataAtualizacao, Visible) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-          const sqlInsert = [
-            nome,
-            desc,
-            modo,
-            tempo,
-            dif,
-            dono,
-            url,
-            publica,
-            dataCriacao,
-            dataCriacao,
-            true
-          ]
-          sql = mysql.format(sql, sqlInsert)
+      const url = await imgHelper.uploadImageGetURL(foto)
 
-          console.log(sql)
+      let sql =
+        "INSERT INTO prato (Nome, Descricao, ModoPreparo, TempoPreparo, Dificuldade, Dono, Foto, Public, DataCriacao, dataAtualizacao, Visible) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+      const sqlInsert = [
+        nome,
+        desc,
+        modo,
+        tempo,
+        dif,
+        dono,
+        url,
+        publica,
+        dataCriacao,
+        dataCriacao,
+        true
+      ]
+      sql = mysql.format(sql, sqlInsert)
 
-          this.Connection.query(sql, (err, result) => {
-            if (err) return reject(err)
-            resolve(result.insertId)
-          })
-        })
+      console.log(sql)
+
+      this.Connection.query(sql, (err, result) => {
+        if (err) return reject(err)
+        resolve(result.insertId)
       })
     })
   }
 
-  update(id, nome, desc, modo, tempo, dif, dono, foto, fotoNome, publica) {
-    return new Promise((resolve, reject) => {
+  update(id, nome, desc, modo, tempo, dif, dono, foto, publica) {
+    return new Promise(async (resolve, reject) => {
       const dataAtualizacao = moment().format("YYYY-MM-DD HH:mm:ss")
 
       if (foto) {
-        helper.base64ImageToBlob(foto).then(img => {
-          helper.uploadImageGetUrl(img, fotoNome, dono).then(url => {
-            let sql =
-              "UPDATE prato SET nome=?, descricao=?, modopreparo=?, tempopreparo=?, dificuldade=?, foto=?, public=?, dataAtualizacao=? where id=? and dono=?"
-            const sqlInsert = [
-              nome,
-              desc,
-              modo,
-              tempo,
-              dif,
-              url,
-              publica,
-              dataAtualizacao,
-              id,
-              dono
-            ]
-            sql = mysql.format(sql, sqlInsert)
+        const url = await imgHelper.uploadImageGetURL(foto)
+        let sql =
+          "UPDATE prato SET nome=?, descricao=?, modopreparo=?, tempopreparo=?, dificuldade=?, foto=?, public=?, dataAtualizacao=? where id=? and dono=?"
+        const sqlInsert = [
+          nome,
+          desc,
+          modo,
+          tempo,
+          dif,
+          url,
+          publica,
+          dataAtualizacao,
+          id,
+          dono
+        ]
+        sql = mysql.format(sql, sqlInsert)
 
-            this.Connection.query(sql, err => {
-              if (err) return reject(err)
-              resolve({ message: "Prato atualizado com sucesso!" })
-            })
-          })
+        this.Connection.query(sql, err => {
+          if (err) return reject(err)
+          resolve({ message: "Prato atualizado com sucesso!" })
         })
       } else {
         let sql =
@@ -149,8 +143,6 @@ class pratosDAO {
       }
 
       const sql = `SELECT * FROM prato WHERE visible = '1' ORDER BY id desc LIMIT ${offset}, ${limit}`
-      // let sqlInsert = [offset, limit];
-      // sql = mysql.format(sql, sqlInsert);
 
       this.Connection.query(sql, (err, result) => {
         if (err) return reject(err)

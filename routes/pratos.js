@@ -8,6 +8,9 @@ const queries = require("../config/queries")
 const PratoDAO = require("../dao/pratoDAO")
 const IngredienteDAO = require("../dao/ingredienteDAO")
 
+const multer = require("multer")
+const multerConfig = require("../config/multer")
+
 /*
 !   /pratos
 */
@@ -15,92 +18,89 @@ const IngredienteDAO = require("../dao/ingredienteDAO")
 /*
  *  Criação de um novo prato
  */
-router.post("/", AuthMiddlewares.isLoggedIn, (req, res, next) => {
-  const {
-    nome,
-    descricao,
-    modo,
-    tempo,
-    dificuldade,
-    foto,
-    fotoNome,
-    publica,
-    ingredientes
-  } = req.body
-  const dono = req.user.id
+router.post(
+  "/",
+  multer(multerConfig).single("file"),
+  AuthMiddlewares.isLoggedIn,
+  (req, res, next) => {
+    const {
+      nome,
+      descricao,
+      modo,
+      tempo,
+      dificuldade,
+      publica,
+      ingredientes
+    } = req.body
+    const dono = req.user.id
 
-  const validouDificuldade = helper.validaDificuldade(dificuldade)
-  const validouIngredientes = helper.validaIngredientes(ingredientes)
+    const validouDificuldade = helper.validaDificuldade(dificuldade)
+    const validouIngredientes = helper.validaIngredientes(ingredientes)
 
-  if (!validouDificuldade || !validouIngredientes) {
-    res.status(400).json({ message: "Dados incorretos" })
-  } else {
-    new PratoDAO(req.connection)
-      .create(
-        nome,
-        descricao,
-        modo,
-        tempo,
-        dificuldade,
-        dono,
-        foto,
-        fotoNome,
-        publica
-      )
-      .then(pratoId => {
-        ingredientes.forEach(ingrediente => {
-          const { nome, quantidade, unidadeMedida } = ingrediente
+    if (!validouDificuldade || !validouIngredientes) {
+      res.status(400).json({ message: "Dados incorretos" })
+    } else {
+      new PratoDAO(req.connection)
+        .create(
+          nome,
+          descricao,
+          modo,
+          tempo,
+          dificuldade,
+          dono,
+          req.file,
+          publica
+        )
+        .then(pratoId => {
+          ingredientes.forEach(ingrediente => {
+            const { nome, quantidade, unidadeMedida } = ingrediente
 
-          new IngredienteDAO(req.connection)
-            .create(pratoId, nome, quantidade, unidadeMedida)
-            .then(() => {})
-            .catch(next)
+            new IngredienteDAO(req.connection)
+              .create(pratoId, nome, quantidade, unidadeMedida)
+              .then(() => {})
+              .catch(next)
+          })
         })
-      })
-      .catch(next)
+        .catch(next)
 
-    res.json({ message: "Prato cadastrado com sucesso" })
+      res.json({ message: "Prato cadastrado com sucesso" })
+    }
   }
-})
+)
 
 /*
  *  Atualizar um prato
  */
-router.put("/:id/update", AuthMiddlewares.isLoggedIn, (req, res, next) => {
-  const {
-    nome,
-    descricao,
-    modo,
-    tempo,
-    dificuldade,
-    foto,
-    fotoNome,
-    publica
-  } = req.body
-  const dono = req.user.id
+router.put(
+  "/:id/update",
+  multer(multerConfig).single("file"),
+  AuthMiddlewares.isLoggedIn,
+  (req, res, next) => {
+    const { nome, descricao, modo, tempo, dificuldade, publica } = req.body
+    const dono = req.user.id
 
-  const validouDificuldade = helper.validaDificuldade(dificuldade)
+    const validouDificuldade = helper.validaDificuldade(dificuldade)
 
-  if (!validouDificuldade) {
-    res.status(400).json({ message: "Dados incorretos" })
-  } else {
-    new PratoDAO(req.connection)
-      .update(
-        req.params.id,
-        nome,
-        descricao,
-        modo,
-        tempo,
-        dificuldade,
-        dono,
-        foto,
-        fotoNome,
-        publica
-      )
-      .then(result => res.json(result))
-      .catch(next)
+    if (!validouDificuldade) {
+      res.status(400).json({ message: "Dados incorretos" })
+    } else {
+      new PratoDAO(req.connection)
+        .update(
+          req.params.id,
+          nome,
+          descricao,
+          modo,
+          tempo,
+          dificuldade,
+          dono,
+          req.file,
+          publica
+        )
+        .then(result => res.json(result))
+        .catch(next)
+    }
   }
-})
+)
 
 /*
  *  Deletar um prato
