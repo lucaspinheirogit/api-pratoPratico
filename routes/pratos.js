@@ -30,7 +30,7 @@ router.post(
       tempo,
       dificuldade,
       publica,
-      ingredientes
+      ingredientes = []
     } = req.body
     const dono = req.user.id
 

@@ -22,7 +22,7 @@ module.exports = {
     }
     return true
   },
-  validaIngredientes: ingredientes => {
+  validaIngredientes: (ingredientes = []) => {
     let validou = true
     ingredientes.forEach(ingrediente => {
       // Checa se a unidade de medida está correta , pois são aceitos valores pré-definidos (enum)
