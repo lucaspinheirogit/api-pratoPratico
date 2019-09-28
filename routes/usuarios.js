@@ -36,7 +36,7 @@ router.get("/", AuthMiddlewares.isLoggedIn, (req, res, next) => {
  */
 router.put(
   "/",
-  multer(multerConfig).single("file"),
+  multer(multerConfig).single("fileData"),
   AuthMiddlewares.isLoggedIn,
   async (req, res, next) => {
     const { nome, senha } = req.body

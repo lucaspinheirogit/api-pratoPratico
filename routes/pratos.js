@@ -20,7 +20,7 @@ const multerConfig = require("../config/multer")
  */
 router.post(
   "/",
-  multer(multerConfig).single("file"),
+  multer(multerConfig).single("fileData"),
   AuthMiddlewares.isLoggedIn,
   (req, res, next) => {
     const {
@@ -73,7 +73,7 @@ router.post(
  */
 router.put(
   "/:id/update",
-  multer(multerConfig).single("file"),
+  multer(multerConfig).single("fileData"),
   AuthMiddlewares.isLoggedIn,
   (req, res, next) => {
     const { nome, descricao, modo, tempo, dificuldade, publica } = req.body

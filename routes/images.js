@@ -23,7 +23,7 @@ const helper = require("../helpers")
 /**
  * Adding new file to the storage
  */
-router.post("/upload", helper.multer.single("file"), (req, res) => {
+router.post("/upload", helper.multer.single("fileData"), (req, res) => {
   const { file } = req
 
   if (file) {

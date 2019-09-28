@@ -36,7 +36,7 @@ router.post("/login", (req, res, next) => {
  */
 router.post(
   "/signup",
-  multer(multerConfig).single("file"),
+  multer(multerConfig).single("fileData"),
   async (req, res, next) => {
     const { nome, email, senha } = req.body
 
