@@ -41,17 +41,16 @@ module.exports = {
     knexQuery.offset(query.offset)
 
     // Se Ingredientes foram informados, buscar pratos com aqueles ingredientes
+    const ingredientes = []
     if (query.ingredientes) {
-      const ingredientes = []
-
       // Para cada ingrediente, checa se o mesmo existe e poe na variavel ingredientes
       for (let j = 0; j < query.ingredientes.length; j += 1) {
         const ingredientesQuery = knex("ingrediente")
-        ingredientesQuery.where("nome", query.ingredientes[j])
-        const res = ingredientesQuery
-        if (res.length > 0) {
-          ingredientes.push(res[0])
-        }
+        ingredientesQuery.where("nome", query.ingredientes[j]).then(result => {
+          if (result.length > 0) {
+            ingredientes.push(result[0].Id)
+          }
+        })
       }
 
       const pratos = await knexQuery
@@ -66,7 +65,7 @@ module.exports = {
 
           const PratoIngredienteQuery = knex("prato_ingrediente")
           PratoIngredienteQuery.where("prato_id", prato.Id)
-          PratoIngredienteQuery.where("ingrediente_id", ingrediente.Id)
+          PratoIngredienteQuery.where("ingrediente_id", ingrediente)
           PratoIngredienteQuery.innerJoin(
             "prato",
             "prato_ingrediente.prato_id",
@@ -75,7 +74,7 @@ module.exports = {
 
           // Pega a tabela prato_ingrediente e checa se o prato(id) e o ingrediente(id) dao match
 
-          const res = PratoIngredienteQuery
+          const res = await PratoIngredienteQuery
           if (res.length > 0) {
             // Se existe um prato com aquele id e aquele ingrediente,
             // coloca o resultado no array de pratos

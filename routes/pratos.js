@@ -230,8 +230,8 @@ router.post("/search", (req, res) => {
       tempo: parseInt(tempo, 10),
       dificuldade,
       ingredientes,
-      offset,
-      limit
+      offset: 0,
+      limit: 100
     })
     .then(pratos => res.json(pratos))
 })
