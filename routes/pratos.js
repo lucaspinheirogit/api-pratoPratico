@@ -23,16 +23,11 @@ router.post(
   multer(multerConfig).single("fileData"),
   AuthMiddlewares.isLoggedIn,
   (req, res, next) => {
-    const {
-      nome,
-      descricao,
-      modo,
-      tempo,
-      dificuldade,
-      publica,
-      ingredientes = []
-    } = req.body
+    const { nome, descricao, modo, tempo, dificuldade, publica } = req.body
+    let { ingredientes = [] } = req.body
     const dono = req.user.id
+
+    ingredientes = JSON.parse(ingredientes)
 
     const validouDificuldade = helper.validaDificuldade(dificuldade)
     const validouIngredientes = helper.validaIngredientes(ingredientes)
