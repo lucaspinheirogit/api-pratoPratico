@@ -40,6 +40,8 @@ router.post(
   async (req, res, next) => {
     const { nome, email, senha } = req.body
     const img = req.file || null
+    console.log(req.file)
+    console.log(img)
 
     new AuthDAO(req.connection)
       .signup(nome, email, senha, img)

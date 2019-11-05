@@ -40,9 +40,10 @@ router.put(
   AuthMiddlewares.isLoggedIn,
   async (req, res, next) => {
     const { nome, senha } = req.body
+    const img = req.file || null
 
     new UsuarioDAO(req.connection)
-      .update(req.user.id, nome, senha, req.file)
+      .update(req.user.id, nome, senha, img)
       .then(result => res.json(result))
       .catch(next)
   }
