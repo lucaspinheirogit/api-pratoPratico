@@ -68,7 +68,9 @@ class AuthDAO {
         } else {
           const hash = bcrypt.hashSync(senha, 3)
           const dataAtual = moment().format("YYYY-MM-DD HH:mm:ss")
-          const url = await imgHelper.uploadImageGetURL(image)
+          const url = img
+            ? await imgHelper.uploadImageGetURL(image)
+            : "https://firebasestorage.googleapis.com/v0/b/pratopratico-ebbc3.appspot.com/o/Screenshot_20191027-145340.png_1572199084220?alt=media&token=35302645-a430-4101-b3be-f3cdf5a3cce6"
 
           let sql =
             "INSERT INTO usuario (nome, img, email, senha, dataCriacao, dataAtualizacao) VALUES (?, ?, ?, ?, ?, ?)"

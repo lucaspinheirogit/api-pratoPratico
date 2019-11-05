@@ -39,9 +39,10 @@ router.post(
   multer(multerConfig).single("fileData"),
   async (req, res, next) => {
     const { nome, email, senha } = req.body
+    const img = req.file || null
 
     new AuthDAO(req.connection)
-      .signup(nome, email, senha, req.file)
+      .signup(nome, email, senha, img)
       .then(result => {
         result.auth
           ? new AuthDAO(req.connection)
